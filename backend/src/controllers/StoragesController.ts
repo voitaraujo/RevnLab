@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
 
 import { Storages } from '../entity/Storages'
-import { MovStorages } from '../entity/MovStorages'
 import { decryptToken } from '../services/jwtAuth'
 
 

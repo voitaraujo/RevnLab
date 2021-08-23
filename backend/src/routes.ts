@@ -4,6 +4,7 @@ import { hasToken } from './services/jwtAuth'
 import UserController from './controllers/UserController';
 import StoragesController from './controllers/StoragesController';
 import MachinesController from './controllers/MachinesController';
+import StoragesMovController from './controllers/StoragesMovController';
 
 const routes = Router();
 
@@ -12,6 +13,9 @@ routes.post('/authentication', UserController.Login);
 //Depósitos
 routes.get('/storages', hasToken, StoragesController.Show);
 routes.get('/storages/:DL', hasToken, StoragesController.See);
+
+//Movimentação dos depósitos
+routes.get('/storages/inventory/:DL', hasToken, StoragesMovController.See);
 
 //Máquinas
 routes.get('/machines/:DL', hasToken, MachinesController.Show);

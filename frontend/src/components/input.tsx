@@ -1,8 +1,6 @@
 import React from "react";
-import { makeStyles, ThemeProvider, createTheme } from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
-
-import { PALETTE_RED_PRIMARY } from "../assets/colors";
 
 interface IProps {
   onChange: (
@@ -27,7 +25,6 @@ export const InputSimple = (props: IProps): JSX.Element => {
 
   return (
     <form className={classes.root} noValidate autoComplete="off">
-        <ThemeProvider theme={theme}>
       <TextField
         disabled={props.disabled}
         style={props.style}
@@ -37,7 +34,6 @@ export const InputSimple = (props: IProps): JSX.Element => {
         onChange={(e) => handleChange(e)}
         autoFocus={props.focus}
       />
-      </ThemeProvider>
     </form>
   );
 };
@@ -50,10 +46,3 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 }));
-
-const theme = createTheme({
-    palette: {
-      primary: PALETTE_RED_PRIMARY,
-    },
-  });
-  
