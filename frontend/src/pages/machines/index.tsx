@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import moment from "moment";
 import { useParams } from "react-router-dom";
 import { Toast } from "../../components/toasty";
 import { api } from "../../services/api";
@@ -10,6 +11,7 @@ import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
+import MenuItem from "@material-ui/core/MenuItem";
 import Typography from "@material-ui/core/Typography";
 import Divider from "@material-ui/core/Divider";
 
@@ -19,6 +21,7 @@ import {
   FullScreenDialog,
 } from "../../components/dialogs";
 import { InputNumber } from "../../components/inputNumber";
+import { SelectControlled } from "../../components/select";
 
 interface IParams {
   DL: string;
@@ -30,6 +33,9 @@ interface IInventario {
   SEL: string;
   PRODUTO: string;
   Qtd: number | string | null;
+  Refdt: string;
+  Filial: string;
+  CHAPA: string
 }
 
 interface IMachines {
@@ -49,15 +55,27 @@ interface IDetalhes {
   Modelo: string;
 }
 
+interface IReferences {
+  Refdt: string;
+  RefUd: string;
+  RefPdt: string;
+}
+
+interface LoadDTO {
+  machines: IMachines[];
+  references: IReferences[];
+}
+
 const Machines = (): JSX.Element => {
   const [machines, setMachines] = useState<IMachines[]>([]);
   const [produtos, setProdutos] = useState<IInventario[]>([]);
+  const [references, setReferences] = useState<IReferences[]>([]);
+  const [selectIndex, setSelectIndex] = useState("");
   const [machineInfo, setMachineInfo] =
     useState<IDetalhes>(DetailsInitialState);
   const [open, setOpen] = useState(false);
 
   const Params = useParams<IParams>();
-
   const columns: GridColDef[] = [
     {
       field: "id",
@@ -100,13 +118,37 @@ const Machines = (): JSX.Element => {
     },
   ];
 
+  //carrega a lista de máquinas do DL
+  useEffect(() => {
+    async function load() {
+      try {
+        const response = await api.get<LoadDTO>(`/machines/${Params.DL}`);
+
+        setReferences(response.data.references);
+        setMachines(response.data.machines);
+      } catch (err) {
+        Toast("Falha ao buscar as máquinas do depósito", "error");
+      }
+    }
+    load();
+  }, [Params.DL]);
+
+  const handleChangeSelect = (index: number | unknown, CHAPA: string): void => {
+    setSelectIndex(String(index));
+    handleLoadInventory(CHAPA, references[Number(index)]);
+  };
+
   const handleOpenDialog = (CHAPA: string) => {
     handleLoadMachineDetails(CHAPA);
+    setProdutos([]);
+    setSelectIndex("");
     setOpen(true);
   };
 
   const handleCloseDialog = () => {
     setOpen(false);
+    setSelectIndex("");
+    setProdutos([]);
     setMachineInfo(DetailsInitialState);
   };
 
@@ -121,10 +163,10 @@ const Machines = (): JSX.Element => {
     }
   };
 
-  const handleLoadInventory = async (CHAPA: string) => {
+  const handleLoadInventory = async (CHAPA: string, Ref: IReferences) => {
     try {
       const response = await api.get<IInventario[]>(
-        `/inventory/machines/${Params.DL}/${CHAPA}`
+        `/inventory/machines/${Params.DL}/${CHAPA}/${Ref.RefPdt}/${Ref.RefUd}`
       );
 
       setProdutos(response.data);
@@ -134,21 +176,52 @@ const Machines = (): JSX.Element => {
   const handleValueChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
     index: number
-  ): void => {};
+  ): void => {
+    const aux = [...produtos];
 
-  //carrega a lista de máquinas do DL
-  useEffect(() => {
-    async function load() {
-      try {
-        const response = await api.get(`/machines/${Params.DL}`);
+    aux[index].Qtd = event.target.value;
 
-        setMachines(response.data);
-      } catch (err) {
-        Toast("Falha ao buscar as máquinas do depósito", "error");
+    setProdutos(aux);
+  };
+
+  const handleSubmit = async (): Promise<boolean> => {
+    let test = true;
+
+    if (produtos.length === 0) {
+      Toast("Inventário vazio", "default");
+      test = false;
+    }
+
+    for (let i = 0; i < produtos.length; i++) {
+      if (
+        produtos[i].Qtd === "" ||
+        produtos[i].Qtd === null ||
+        typeof produtos[i].Qtd == "undefined"
+      ) {
+        Toast(
+          "Qtd. de um ou mais itens do inventário não informados",
+          "default"
+        );
+        test = false;
+        break;
       }
     }
-    load();
-  }, []);
+
+    if(test){
+      try {
+        await api.put(`/inventory/machines/`, {
+          inventario: produtos,
+        });
+  
+        Toast("Inventário salvo com sucesso", "success");
+      } catch (err) {
+        Toast("Falha ao salvar inventário", "error");
+        test = false;
+      }
+    }
+
+    return test;
+  };
 
   return (
     <>
@@ -164,11 +237,25 @@ const Machines = (): JSX.Element => {
               buttonLabel="Inventário"
               buttonColor="primary"
               buttonType="text"
-              onOpen={() => handleLoadInventory(machineInfo.CHAPA)}
+              onConfirm={handleSubmit}
             >
+              <SelectControlled
+                value={selectIndex}
+                onChange={(event) =>
+                  handleChangeSelect(event.target.value, machineInfo.CHAPA)
+                }
+                label="Referencia"
+                variant="outlined"
+              >
+                {references.map((ref, i) => (
+                  <MenuItem value={i} key={i}>
+                    {moment(ref.RefPdt).format("L")}
+                  </MenuItem>
+                ))}
+              </SelectControlled>
               <List>
                 {produtos.map((item, i) => (
-                  <div key={item.DLCod}>
+                  <div key={`${item.PROD}${i}`}>
                     <ListItem>
                       <ListItemIcon>{item.SEL}</ListItemIcon>
                       <ListItemText

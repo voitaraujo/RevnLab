@@ -3,6 +3,7 @@ import { getRepository } from 'typeorm';
 
 import { Machines } from '../entity/Machines'
 import { Storages } from '../entity/Storages'
+import { RefDates } from '../entity/RefDates'
 import { decryptToken } from '../services/jwtAuth'
 
 interface IToken {
@@ -30,6 +31,13 @@ export default {
                 message: 'Esse DL não está atribuído à você'
             })
         } else {
+            const references = verified && await getRepository(RefDates).find({
+                select: ['Refdt', 'RefUd', 'RefPdt'],
+                where: {
+                    RefAno: new Date().getFullYear()
+                }
+            })
+
             const machines = verified && await getRepository(Machines).find({
                 select: ['CHAPA', 'SERIE', 'Modelo'],
                 where: {
@@ -38,7 +46,7 @@ export default {
                 }
             })
 
-            machines ? res.status(200).send(machines) : res.status(400).send({
+            machines && references ? res.status(200).send({ machines, references }) : res.status(400).send({
                 message: 'Error while querying database'
             })
             return res

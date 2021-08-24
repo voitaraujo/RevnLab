@@ -69,7 +69,6 @@ export const InputNumber = (props: IProps): JSX.Element => {
       [event.target.name]: event.target.value,
     });
 
-    console.log({ [event.target.name]: event.target.value });
     props.onChange(event);
   };
 

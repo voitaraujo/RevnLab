@@ -40,19 +40,3 @@ export const Conn = async () => await createConnection({
     console.log(chalk.red(error))
 }
 );
-
-// const config = {
-//     user: 'SLuser',
-//     password: 'Tec1910@',
-//     server: '192.168.1.248',
-//     port: 1433,
-//     database: 'SLAPLIC',
-// }
-
-// export const Conn = () => sql.connect(config).then((pool) => {
-//     console.log('cnnected');
-//     return pool.request().query('select firstname, lastname from Users').then(res => {
-//         console.log(res);
-//     })
-// }).catch(error => console.log(chalk.red('cant connect\n' + error)));
-

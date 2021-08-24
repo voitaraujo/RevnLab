@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useHistory } from "react-router-dom";
 import { api } from "../../services/api";
 
 import { makeStyles } from "@material-ui/core/styles";
@@ -26,7 +25,6 @@ function Login(): JSX.Element {
   const [userCode, setUserCode] = useState("");
   const [userPassword, setUserPassword] = useState("");
   const [wait, setWait] = useState(false);
-  const history = useHistory()
 
   const classes = useStyles();
 

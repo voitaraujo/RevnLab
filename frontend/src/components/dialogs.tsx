@@ -24,7 +24,7 @@ interface IProps {
   title: string,
   onOpen?: () => void,
   onClose?: () => void,
-  onConfirm?: () => void,
+  onConfirm?: () => Promise<boolean>,
   extraActions?: React.ReactNode,
 }
 
@@ -106,9 +106,13 @@ export const FullScreenDialog = (props: IPropsUncontrolled) => {
     props.onClose && props.onClose()
   };
 
-  const handleConfirm = () => {
-    setOpen(false);
-    props.onConfirm && props.onConfirm()
+  const handleConfirm = async () => {
+    let testResult = props.onConfirm && await props.onConfirm()
+    if(typeof testResult != 'undefined'){
+      setOpen(!testResult);
+    }else{
+      setOpen(false)
+    }
   };
 
   return (

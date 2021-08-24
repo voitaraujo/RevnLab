@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import { api } from "../../services/api";
 import { DataGrid, GridColDef } from "@material-ui/data-grid";
+import moment from "moment";
 
-import { createStyles, makeStyles, Theme } from "@material-ui/core";
 import {
   InfoOutlined,
   AccountTreeOutlined,
@@ -15,6 +15,7 @@ import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import Divider from "@material-ui/core/Divider";
+import MenuItem from "@material-ui/core/MenuItem";
 import Typography from "@material-ui/core/Typography";
 
 import {
@@ -24,6 +25,7 @@ import {
 import { ClearButton } from "../../components/buttons";
 import { Toast } from "../../components/toasty";
 import { InputNumber } from "../../components/inputNumber";
+import { SelectControlled } from "../../components/select";
 
 interface IInventario {
   Refdt: string;
@@ -57,13 +59,25 @@ interface IDetalhes {
   DLLoja: string;
 }
 
+interface IReferences {
+  Refdt: string;
+  RefUd: string;
+  RefPdt: string;
+}
+
+interface LoadDTO {
+  storages: IDepositos[];
+  references: IReferences[];
+}
+
 const Storages = (): JSX.Element => {
   const [depositos, setDepositos] = useState<IDepositos[]>([]);
   const [produtos, setProdutos] = useState<IInventario[]>([]);
+  const [references, setReferences] = useState<IReferences[]>([]);
   const [DLInfo, setDLInfo] = useState<IDetalhes>(DetailsInitialState);
   const [open, setOpen] = useState(false);
+  const [selectIndex, setSelectIndex] = useState("");
 
-  const classes = useStyles();
   const history = useHistory();
   const columns: GridColDef[] = [
     {
@@ -103,35 +117,56 @@ const Storages = (): JSX.Element => {
   useEffect(() => {
     async function load() {
       try {
-        const response = await api.get(`/storages`);
+        const response = await api.get<LoadDTO>(`/storages`);
 
-        setDepositos(response.data);
+        setDepositos(response.data.storages);
+        setReferences(response.data.references);
       } catch (err) {
         window.sessionStorage.clear();
         history.push("/");
       }
     }
     load();
-  }, []);
+  }, [history]);
 
   const handleOpenDialog = (DLCOD: string, FILIAL: string) => {
     handleLoadStorageDetails(DLCOD, FILIAL);
+    setSelectIndex("");
+    setProdutos([]);
     setOpen(true);
   };
 
   const handleCloseDialog = () => {
     setOpen(false);
+    setSelectIndex("");
+    setProdutos([]);
     setDLInfo(DetailsInitialState);
   };
 
-  const handleLoadInventory = async (DLCOD: string, FILIAL: string) => {
+  const handleChangeSelect = (
+    index: number | unknown,
+    DL: string,
+    FILIAL: string
+  ): void => {
+    setSelectIndex(String(index));
+    handleLoadInventory(DL, FILIAL, references[Number(index)]);
+  };
+
+  const handleLoadInventory = async (
+    DLCOD: string,
+    FILIAL: string,
+    Ref: IReferences
+  ) => {
+    setProdutos([]);
     try {
       const response = await api.get<IInventario[]>(
-        `/inventory/storages/${DLCOD}/${FILIAL}`
+        `/inventory/storages/${DLCOD}/${FILIAL}/${Ref.RefPdt}/${Ref.RefUd}`
       );
 
       setProdutos(response.data);
-    } catch (err) {}
+    } catch (err) {
+      Toast("Falha ao carregar inventário", "error");
+    }
   };
 
   const handleLoadStorageDetails = async (DLCOD: string, FILIAL: string) => {
@@ -155,6 +190,45 @@ const Storages = (): JSX.Element => {
     setProdutos(aux);
   };
 
+  const handleSubmit = async (): Promise<boolean> => {
+    let test = true;
+
+    if (produtos.length === 0) {
+      Toast("Inventário vazio", "default");
+      test = false;
+    }
+
+    for (let i = 0; i < produtos.length; i++) {
+      if (
+        produtos[i].Qtd === "" ||
+        produtos[i].Qtd === null ||
+        typeof produtos[i].Qtd == "undefined"
+      ) {
+        Toast(
+          "Qtd. de um ou mais itens do inventário não informados",
+          "default"
+        );
+        test = false;
+        break;
+      }
+    }
+
+    if(test){
+      try {
+        await api.put(`/inventory/storages/`, {
+          inventario: produtos,
+        });
+  
+        Toast("Inventário salvo com sucesso", "success");
+      } catch (err) {
+        Toast("Falha ao salvar inventário", "error");
+        test = false;
+      }
+    }
+
+    return test;
+  };
+
   return (
     <>
       <DraggableDialogController
@@ -169,11 +243,29 @@ const Storages = (): JSX.Element => {
               buttonLabel="Inventário"
               buttonColor="primary"
               buttonType="text"
-              onOpen={() => handleLoadInventory(DLInfo.DLCod, DLInfo.Filial)}
+              onConfirm={handleSubmit}
             >
+              <SelectControlled
+                value={selectIndex}
+                onChange={(event) =>
+                  handleChangeSelect(
+                    event.target.value,
+                    DLInfo.DLCod,
+                    DLInfo.Filial
+                  )
+                }
+                label="Referencia"
+                variant="outlined"
+              >
+                {references.map((ref, i) => (
+                  <MenuItem value={i} key={i}>
+                    {moment(ref.RefPdt).format("L")}
+                  </MenuItem>
+                ))}
+              </SelectControlled>
               <List>
                 {produtos.map((item, i) => (
-                  <div key={item.DLCod}>
+                  <div key={item.PROD}>
                     <ListItem>
                       <ListItemText
                         primary={item.PRODUTO}
@@ -243,15 +335,6 @@ const Storages = (): JSX.Element => {
 };
 
 export default Storages;
-
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      width: "100%",
-      backgroundColor: theme.palette.background.paper,
-    },
-  })
-);
 
 const DetailsInitialState = {
   Filial: "",

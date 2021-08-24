@@ -1,5 +1,7 @@
 import React from 'react'
 
+import Typography from '@material-ui/core/Typography'
+
 import { Container } from '../../components/AbstractComponents'
 
 function Unauthorized(): JSX.Element {
@@ -8,9 +10,10 @@ function Unauthorized(): JSX.Element {
     }
 
     return(
-        <Container>
-            <h3>Ops!</h3>
-            <h6>Parece que você não pode acessar essa página no momento, clique<a href={safeLink()}>aqui</a></h6>
+        <Container style={{ flexDirection: 'column' }}>
+            <Typography gutterBottom variant='h2' style={{ marginLeft: '8px' }}>Ops!</Typography>
+            <br />
+            <Typography gutterBottom variant='h4' style={{ marginLeft: '8px' }}>Parece que você não pode acessar essa página no momento, <br />clique <a href={safeLink()}>aqui</a> para retornar à aplicação.</Typography>
         </Container>
     )
 }

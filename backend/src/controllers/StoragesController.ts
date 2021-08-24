@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
 
 import { Storages } from '../entity/Storages'
+import { RefDates } from '../entity/RefDates'
 import { decryptToken } from '../services/jwtAuth'
 
 
@@ -24,7 +25,14 @@ export default {
             }
         })
 
-        storages ? res.status(200).send(storages) : res.status(400).send({
+        const references = verified && await getRepository(RefDates).find({
+            select: ['Refdt', 'RefUd', 'RefPdt'],
+            where: {
+                RefAno: new Date().getFullYear()
+            }
+        })
+
+        storages && references ? res.status(200).send({ storages, references }) : res.status(400).send({
             message: 'Error while querying database'
         })
 
