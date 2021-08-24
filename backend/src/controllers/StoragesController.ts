@@ -18,7 +18,7 @@ export default {
         const verified = <IToken>decryptToken(token!)
 
         const storages = verified && await getRepository(Storages).find({
-            select: ['DLCod', 'DLNome'],
+            select: ['DLCod', 'DLNome', 'Filial'],
             where: {
                 GestorCod: verified.user_code
             }
@@ -35,13 +35,15 @@ export default {
     async See(req: Request, res: Response) {
         const token = req.get('Authorization')
         const DLid = req.params.DL
+        const Filial = req.params.Filial
 
         const verified = <IToken>decryptToken(token!)
 
         const storage = verified && await getRepository(Storages).find({
             where: {
                 GestorCod: verified.user_code,
-                DLCod: DLid
+                DLCod: DLid,
+                Filial: Filial
             }
         })
 

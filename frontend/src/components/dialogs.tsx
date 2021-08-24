@@ -20,23 +20,36 @@ import CloseIcon from '@material-ui/icons/Close';
 
 
 interface IProps {
-  children: React.ReactChild,
+  children: React.ReactNode,
   title: string,
+  onOpen?: () => void,
+  onClose?: () => void,
+  onConfirm?: () => void,
+  extraActions?: React.ReactNode,
+}
+
+interface IPropsUncontrolled extends IProps {
   buttonLabel?: string | React.ReactElement,
   buttonIcon?: React.ReactElement,
   buttonType?: 'contained' | 'outlined' | 'text',
   buttonColor?: 'primary' | 'secondary'
 }
 
-export const DraggableDialog = (props: IProps) => {
+interface IPropsControlled extends IProps {
+  open: boolean
+}
+
+export const DraggableDialog = (props: IPropsUncontrolled) => {
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
     setOpen(true);
+    props.onOpen && props.onOpen()
   };
 
   const handleClose = () => {
     setOpen(false);
+    props.onClose && props.onClose()
   };
 
   return (
@@ -66,6 +79,7 @@ export const DraggableDialog = (props: IProps) => {
           {props.children}
         </DialogContent>
         <DialogActions>
+          {props.extraActions}
           <Button
             onClick={handleClose}
             color="secondary"
@@ -78,41 +92,89 @@ export const DraggableDialog = (props: IProps) => {
   );
 }
 
-export const FullScreenDialog = (props: IProps) => {
+export const FullScreenDialog = (props: IPropsUncontrolled) => {
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
     setOpen(true);
+    props.onOpen && props.onOpen()
   };
 
   const handleClose = () => {
     setOpen(false);
+    props.onClose && props.onClose()
+  };
+
+  const handleConfirm = () => {
+    setOpen(false);
+    props.onConfirm && props.onConfirm()
   };
 
   return (
     <div>
-      <Button variant={props.buttonType} color={props.buttonColor} onClick={handleClickOpen}>
+      <Button startIcon={props.buttonIcon} variant={props.buttonType} color={props.buttonColor} onClick={handleClickOpen}>
         {props.buttonLabel}
       </Button>
-      <Dialog fullScreen open={open} onClose={handleClose} TransitionComponent={SlideTransition}>
+      <Dialog fullScreen open={open} onClose={handleClose} scroll='paper' TransitionComponent={SlideTransition}>
+        
         <AppBar className={classes.appBar}>
           <Toolbar>
+
             <IconButton edge="start" color="inherit" onClick={handleClose} aria-label="close">
               <CloseIcon />
             </IconButton>
+
             <Typography variant="h6" className={classes.title}>
-              Inventário de
+              {props.title}
             </Typography>
-            <Button autoFocus color="inherit" onClick={handleClose}>
+
+            <Button autoFocus color="inherit" onClick={handleConfirm}>
               Gravar
             </Button>
+
           </Toolbar>
         </AppBar>
         {props.children}
       </Dialog>
     </div>
   );
+}
+
+export const DraggableDialogController = (props: IPropsControlled) => {
+  const { open } = props
+
+  const handleClose = () => {
+    props.onClose && props.onClose()
+  };
+
+  return (
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        PaperComponent={PaperComponent}
+        TransitionComponent={FadeTransition}
+      >
+        <DialogTitle
+          style={{ cursor: 'move' }}
+          id="draggable-dialog-title"
+        >
+          {props.title}
+        </DialogTitle>
+        <DialogContent>
+          {props.children}
+        </DialogContent>
+        <DialogActions>
+          {props.extraActions}
+          <Button
+            onClick={handleClose}
+            color="secondary"
+          >
+            Fechar
+          </Button>
+        </DialogActions>
+      </Dialog>
+  )
 }
 
 const PaperComponent = (props: any) => {

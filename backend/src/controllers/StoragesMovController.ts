@@ -9,13 +9,16 @@ export default {
     async See(req: Request, res: Response) {
         const token = req.get('Authorization')
         const DLid = req.params.DL
+        const Filial = req.params.FILIAL
 
         const verified = decryptToken(token!)
 
         const products = verified && await getRepository(MovStorages).find({
+            select:['DLCod', 'Filial','PROD', 'PRODUTO', 'Refdt', 'Qtd'],
             where: {
-                Refdt: Between(moment().startOf('month').format(), moment().endOf('month').format()),
-                DLCod: DLid
+                Refdt: Between(new Date(moment().startOf('month').format()), new Date(moment().endOf('month').format())),
+                DLCod: DLid,
+                Filial: Filial
             }
         })
 

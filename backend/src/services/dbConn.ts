@@ -7,6 +7,7 @@ import { Storages } from "../entity/Storages";
 import { MovStorages } from "../entity/MovStorages";
 import { Machines } from "../entity/Machines";
 import { MovMachines } from "../entity/MovMachines";
+import { RefDates } from "../entity/RefDates";
 
 export const Conn = async () => await createConnection({
     type: "mssql",
@@ -21,7 +22,8 @@ export const Conn = async () => await createConnection({
         Storages,
         Machines,
         MovStorages,
-        MovMachines
+        MovMachines,
+        RefDates
     ],
     extra: {
         trustedConnection: true

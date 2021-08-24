@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useHistory } from "react-router-dom";
 import { api } from "../../services/api";
 
 import { makeStyles } from "@material-ui/core/styles";
@@ -25,6 +26,7 @@ function Login(): JSX.Element {
   const [userCode, setUserCode] = useState("");
   const [userPassword, setUserPassword] = useState("");
   const [wait, setWait] = useState(false);
+  const history = useHistory()
 
   const classes = useStyles();
 
@@ -61,8 +63,9 @@ function Login(): JSX.Element {
       response.data.user_token && window.sessionStorage.setItem("token", response.data.user_token);
       response.data.user && window.sessionStorage.setItem("user", response.data.user);
       
+      // history.push('/inventario')
+      // aqui não da pra usar o history.push porque o sessionStorage não é sincrono(vou chegar em inventário mais rapido do que vou gravar o token no navegador, ai da erro na rota)
       window.location.assign('/inventario')
-
     } catch (err) {
       Toast('Falha na autenticação', 'error')
       setWait(false);
