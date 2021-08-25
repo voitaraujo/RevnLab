@@ -213,12 +213,12 @@ const Storages = (): JSX.Element => {
       }
     }
 
-    if(test){
+    if (test) {
       try {
         await api.put(`/inventory/storages/`, {
           inventario: produtos,
         });
-  
+
         Toast("Inventário salvo com sucesso", "success");
       } catch (err) {
         Toast("Falha ao salvar inventário", "error");
@@ -264,29 +264,35 @@ const Storages = (): JSX.Element => {
                 ))}
               </SelectControlled>
               <List>
-                {produtos.map((item, i) => (
-                  <div key={item.PROD}>
-                    <ListItem>
-                      <ListItemText
-                        primary={item.PRODUTO}
-                        secondary={`Código: ${item.PROD}`}
-                      />
-                      <ListItemSecondaryAction
-                        style={{ width: "10%", minWidth: "100px" }}
-                      >
-                        <InputNumber
-                          decimals={0}
-                          onChange={(event) => handleValueChange(event, i)}
-                          disabled={false}
-                          label="Qtd"
-                          value={item.Qtd}
-                          type="outlined"
+                {produtos.length === 0 ? (
+                  <Typography gutterBottom variant="h6">
+                    Nenhum produto à exibir.
+                  </Typography>
+                ) : (
+                  produtos.map((item, i) => (
+                    <div key={item.PROD}>
+                      <ListItem>
+                        <ListItemText
+                          primary={item.PRODUTO}
+                          secondary={`Código: ${item.PROD}`}
                         />
-                      </ListItemSecondaryAction>
-                    </ListItem>
-                    <Divider />
-                  </div>
-                ))}
+                        <ListItemSecondaryAction
+                          style={{ width: "10%", minWidth: "100px" }}
+                        >
+                          <InputNumber
+                            decimals={0}
+                            onChange={(event) => handleValueChange(event, i)}
+                            disabled={false}
+                            label="Qtd"
+                            value={item.Qtd}
+                            type="outlined"
+                          />
+                        </ListItemSecondaryAction>
+                      </ListItem>
+                      <Divider />
+                    </div>
+                  ))
+                )}
               </List>
             </FullScreenDialog>
             <ClearButton
@@ -353,7 +359,7 @@ const DetailsInitialState = {
 };
 
 const DepositoStateToTable = (Depositos: IDepositos[]): IDepositos[] => {
-  let aux: IDepositos[] = [];
+  const aux: IDepositos[] = [];
 
   Depositos.forEach((dep) =>
     aux.push({

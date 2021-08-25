@@ -35,7 +35,7 @@ interface IInventario {
   Qtd: number | string | null;
   Refdt: string;
   Filial: string;
-  CHAPA: string
+  CHAPA: string;
 }
 
 interface IMachines {
@@ -170,7 +170,9 @@ const Machines = (): JSX.Element => {
       );
 
       setProdutos(response.data);
-    } catch (err) {}
+    } catch (err) {
+      Toast("Não foi possivel carregar o inventário da máquina", "error");
+    }
   };
 
   const handleValueChange = (
@@ -207,12 +209,12 @@ const Machines = (): JSX.Element => {
       }
     }
 
-    if(test){
+    if (test) {
       try {
         await api.put(`/inventory/machines/`, {
           inventario: produtos,
         });
-  
+
         Toast("Inventário salvo com sucesso", "success");
       } catch (err) {
         Toast("Falha ao salvar inventário", "error");
@@ -254,30 +256,36 @@ const Machines = (): JSX.Element => {
                 ))}
               </SelectControlled>
               <List>
-                {produtos.map((item, i) => (
-                  <div key={`${item.PROD}${i}`}>
-                    <ListItem>
-                      <ListItemIcon>{item.SEL}</ListItemIcon>
-                      <ListItemText
-                        primary={item.PRODUTO}
-                        secondary={`Código: ${item.PROD}`}
-                      />
-                      <ListItemSecondaryAction
-                        style={{ width: "10%", minWidth: "100px" }}
-                      >
-                        <InputNumber
-                          decimals={0}
-                          onChange={(event) => handleValueChange(event, i)}
-                          disabled={false}
-                          label="Qtd"
-                          value={item.Qtd}
-                          type="outlined"
+                {produtos.length === 0 ? (
+                  <Typography gutterBottom variant="h6">
+                    Nenhum produto à exibir.
+                  </Typography>
+                ) : (
+                  produtos.map((item, i) => (
+                    <div key={`${item.PROD}${i}`}>
+                      <ListItem>
+                        <ListItemIcon>{item.SEL}</ListItemIcon>
+                        <ListItemText
+                          primary={item.PRODUTO}
+                          secondary={`Código: ${item.PROD}`}
                         />
-                      </ListItemSecondaryAction>
-                    </ListItem>
-                    <Divider />
-                  </div>
-                ))}
+                        <ListItemSecondaryAction
+                          style={{ width: "10%", minWidth: "100px" }}
+                        >
+                          <InputNumber
+                            decimals={0}
+                            onChange={(event) => handleValueChange(event, i)}
+                            disabled={false}
+                            label="Qtd"
+                            value={item.Qtd}
+                            type="outlined"
+                          />
+                        </ListItemSecondaryAction>
+                      </ListItem>
+                      <Divider />
+                    </div>
+                  ))
+                )}
               </List>
             </FullScreenDialog>
           </>
@@ -314,7 +322,7 @@ const Machines = (): JSX.Element => {
 export default Machines;
 
 const MachinesStateToTable = (Machines: IMachines[]): IMachines[] => {
-  let aux: IMachines[] = [];
+  const aux: IMachines[] = [];
 
   Machines.forEach((maq) =>
     aux.push({
