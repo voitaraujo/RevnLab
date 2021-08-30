@@ -17,4 +17,4 @@ app.use(express.urlencoded({ extended: true }))
 app.use(cors());
 app.use(routes);
 
-app.listen(process.env.SERVER_PORT);
+app.listen(3305);

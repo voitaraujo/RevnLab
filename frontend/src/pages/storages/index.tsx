@@ -265,9 +265,11 @@ const Storages = (): JSX.Element => {
               </SelectControlled>
               <List>
                 {produtos.length === 0 ? (
+                  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                   <Typography gutterBottom variant="h6">
                     Nenhum produto à exibir.
                   </Typography>
+                  </div>
                 ) : (
                   produtos.map((item, i) => (
                     <div key={item.PROD}>

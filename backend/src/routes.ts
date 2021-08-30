@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, Response, Request } from 'express';
 
 import { hasToken } from './services/jwtAuth'
 import UserController from './controllers/UserController';
@@ -8,6 +8,8 @@ import StoragesMovController from './controllers/StoragesMovController';
 import MachinesMovController from './controllers/MachinesMovController';
 
 const routes = Router();
+
+routes.get('/', (req: Request, res: Response) => res.status(200).send({ message: 'API rodando' }));
 
 routes.post('/authentication', UserController.Login);
 
