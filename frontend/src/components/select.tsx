@@ -6,11 +6,12 @@ import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
 
 interface IProps {
-  onChange: (event: React.ChangeEvent<{ value: unknown }>) => void;
+  onChange?: (event: React.ChangeEvent<{ value: unknown }>) => void;
   label: string;
   variant: "filled" | "outlined" | "standard";
   value: string;
   children?: React.ReactNode
+  disabled?: boolean
 }
 
 export const SelectControlled = (props: IProps): JSX.Element => {
@@ -31,6 +32,7 @@ export const SelectControlled = (props: IProps): JSX.Element => {
         value={props.value}
         onChange={handleChange}
         label={props.label}
+        disabled={props.disabled}
       >
         <MenuItem value="">
           <em>Nenhuma</em>

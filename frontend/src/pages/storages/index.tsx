@@ -78,6 +78,8 @@ const Storages = (): JSX.Element => {
   const [open, setOpen] = useState(false);
   const [selectIndex, setSelectIndex] = useState("");
 
+  const FixedDtInicial = moment().startOf("month").format();
+  const FixedDtFinal = moment().endOf("month").format();
   const history = useHistory();
   const columns: GridColDef[] = [
     {
@@ -155,12 +157,15 @@ const Storages = (): JSX.Element => {
   const handleLoadInventory = async (
     DLCOD: string,
     FILIAL: string,
-    Ref: IReferences
+    Ref?: IReferences
   ) => {
     setProdutos([]);
     try {
+      // const response = await api.get<IInventario[]>(
+      //   `/inventory/storages/${DLCOD}/${FILIAL}/${Ref.RefPdt}/${Ref.RefUd}`
+      // );
       const response = await api.get<IInventario[]>(
-        `/inventory/storages/${DLCOD}/${FILIAL}/${Ref.RefPdt}/${Ref.RefUd}`
+        `/inventory/storages/${DLCOD}/${FILIAL}/${FixedDtInicial}/${FixedDtFinal}`
       );
 
       setProdutos(response.data);
@@ -244,16 +249,18 @@ const Storages = (): JSX.Element => {
               buttonColor="primary"
               buttonType="text"
               onConfirm={handleSubmit}
+              onOpen={() => handleLoadInventory(DLInfo.DLCod, DLInfo.Filial)}
             >
               <SelectControlled
-                value={selectIndex}
-                onChange={(event) =>
-                  handleChangeSelect(
-                    event.target.value,
-                    DLInfo.DLCod,
-                    DLInfo.Filial
-                  )
-                }
+                value={String(moment().month())}
+                // onChange={(event) =>
+                //   handleChangeSelect(
+                //     event.target.value,
+                //     DLInfo.DLCod,
+                //     DLInfo.Filial
+                //   )
+                // }
+                disabled={true}
                 label="Referencia"
                 variant="outlined"
               >
@@ -265,10 +272,16 @@ const Storages = (): JSX.Element => {
               </SelectControlled>
               <List>
                 {produtos.length === 0 ? (
-                  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                  <Typography gutterBottom variant="h6">
-                    Nenhum produto à exibir.
-                  </Typography>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Typography gutterBottom variant="h6">
+                      Nenhum produto à exibir.
+                    </Typography>
                   </div>
                 ) : (
                   produtos.map((item, i) => (

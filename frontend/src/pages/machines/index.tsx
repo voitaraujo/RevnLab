@@ -70,17 +70,19 @@ const Machines = (): JSX.Element => {
   const [machines, setMachines] = useState<IMachines[]>([]);
   const [produtos, setProdutos] = useState<IInventario[]>([]);
   const [references, setReferences] = useState<IReferences[]>([]);
-  const [selectIndex, setSelectIndex] = useState("");
   const [machineInfo, setMachineInfo] =
     useState<IDetalhes>(DetailsInitialState);
   const [open, setOpen] = useState(false);
+  const [selectIndex, setSelectIndex] = useState("");
 
+  const FixedDtInicial = moment().startOf("month").format();
+  const FixedDtFinal = moment().endOf("month").format();
   const Params = useParams<IParams>();
   const columns: GridColDef[] = [
     {
       field: "id",
       headerName: "CHAPA",
-      width: 90,
+      width: 110,
       editable: false,
       sortable: true,
     },
@@ -163,10 +165,13 @@ const Machines = (): JSX.Element => {
     }
   };
 
-  const handleLoadInventory = async (CHAPA: string, Ref: IReferences) => {
+  const handleLoadInventory = async (CHAPA: string, Ref?: IReferences) => {
     try {
+      // const response = await api.get<IInventario[]>(
+      //   `/inventory/machines/${Params.DL}/${CHAPA}/${Ref.RefPdt}/${Ref.RefUd}`
+      // );
       const response = await api.get<IInventario[]>(
-        `/inventory/machines/${Params.DL}/${CHAPA}/${Ref.RefPdt}/${Ref.RefUd}`
+        `/inventory/machines/${Params.DL}/${CHAPA}/${FixedDtInicial}/${FixedDtFinal}`
       );
 
       setProdutos(response.data);
@@ -240,12 +245,14 @@ const Machines = (): JSX.Element => {
               buttonColor="primary"
               buttonType="text"
               onConfirm={handleSubmit}
+              onOpen={() => handleLoadInventory(machineInfo.CHAPA)}
             >
               <SelectControlled
-                value={selectIndex}
-                onChange={(event) =>
-                  handleChangeSelect(event.target.value, machineInfo.CHAPA)
-                }
+                value={String(moment().month())}
+                // onChange={(event) =>
+                //   handleChangeSelect(event.target.value, machineInfo.CHAPA)
+                // }
+                disabled={true}
                 label="Referencia"
                 variant="outlined"
               >
@@ -257,10 +264,16 @@ const Machines = (): JSX.Element => {
               </SelectControlled>
               <List>
                 {produtos.length === 0 ? (
-                  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                  <Typography gutterBottom variant="h6">
-                    Nenhum produto à exibir.
-                  </Typography>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Typography gutterBottom variant="h6">
+                      Nenhum produto à exibir.
+                    </Typography>
                   </div>
                 ) : (
                   produtos.map((item, i) => (

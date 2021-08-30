@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { api } from "../../services/api";
+// import { useHistory } from 'react-router-dom'
 
 import { makeStyles } from "@material-ui/core/styles";
 import Card from "@material-ui/core/Card";
@@ -27,6 +28,7 @@ function Login(): JSX.Element {
   const [wait, setWait] = useState(false);
 
   const classes = useStyles();
+  // const history = useHistory()
 
   const handleUpdateUserCode = (
     e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
@@ -50,22 +52,24 @@ function Login(): JSX.Element {
 
   const handleLogin = async () => {
     setWait(true);
-    Toast('Autenticando', 'default')
+    Toast("Autenticando", "default");
     try {
       const response = await api.post<IAuthResponse>("/authentication", {
         user: userCode,
         password: userPassword,
       });
-      Toast('Autenticado', 'success')
 
-      response.data.user_token && window.sessionStorage.setItem("token", response.data.user_token);
-      response.data.user && window.sessionStorage.setItem("user", response.data.user);
-      
+      Toast("Autenticado", "success");
+      response.data.user_token &&
+        window.sessionStorage.setItem("token", response.data.user_token);
+      response.data.user &&
+        window.sessionStorage.setItem("user", response.data.user);
+
       // history.push('/inventario')
       // aqui não da pra usar o history.push porque o sessionStorage não é sincrono(vou chegar em inventário mais rapido do que vou gravar o token no navegador, ai da erro na rota)
-      window.location.assign('/inventario')
+      window.location.assign("/inventario");
     } catch (err) {
-      Toast('Falha na autenticação', 'error')
+      Toast("Falha na autenticação", "error");
       setWait(false);
     }
   };
