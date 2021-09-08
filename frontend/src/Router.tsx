@@ -24,12 +24,12 @@ function InnerRoutes(): JSX.Element {
 
         <Route exact path="/inventario" type="inner">
           <Storages />
-          {/* <AppBar /> */}
+          <AppBar />
         </Route>
         
         <Route exact path="/maquinaDL/:DL" type="inner">
           <Machines />
-          {/* <AppBar /> */}
+          <AppBar />
         </Route>
 
         <PureRoute exact path="/unauthorized" render={() => <Unauthorized />} />

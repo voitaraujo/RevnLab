@@ -90,6 +90,7 @@ const Machines = (): JSX.Element => {
 
   return (
       <DataGrid
+        style={{ height: 'calc(100% - 64px)' }}
         columns={columns}
         rows={MachinesStateToTable(machines)}
         pageSize={MachinesStateToTable(machines).length > 100 ? 100 : MachinesStateToTable(machines).length}

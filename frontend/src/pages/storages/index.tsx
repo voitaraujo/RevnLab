@@ -76,6 +76,7 @@ const Storages = (): JSX.Element => {
 
   return (
       <DataGrid
+        style={{ height: 'calc(100% - 64px)' }}
         columns={columns}
         rows={DepositoStateToTable(depositos)}
         pageSize={DepositoStateToTable(depositos).length > 100 ? 100 : DepositoStateToTable(depositos).length}

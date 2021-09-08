@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { useHistory } from "react-router-dom";
 import { api } from "../../services/api";
 
-import { AccountTreeOutlined, InfoOutlined } from "@material-ui/icons";
+import { AccountTreeOutlined, InfoOutlined, LaptopWindows } from "@material-ui/icons";
 import Typography from "@material-ui/core/Typography";
 
 import { DraggableDialogController } from "../../components/dialogs";
@@ -61,6 +61,11 @@ const Details = ({ DL, Filial, references }: IProps): JSX.Element => {
         setDLInfo(DetailsInitialState);
     };
 
+    const handleMoveToMachines = (DLCOD: string, DLNAME: string) => {
+        history.push(`/maquinaDL/${DLCOD}`)
+        window.sessionStorage.setItem('ScreenDesc', DLNAME)
+    }
+
     return (
         <>
             <ClearButton
@@ -80,7 +85,7 @@ const Details = ({ DL, Filial, references }: IProps): JSX.Element => {
                             icon={<AccountTreeOutlined />}
                             label="Máquinas"
                             disabled={!DLInfo.DLCod}
-                            onClick={() => history.push(`/maquinaDL/${DLInfo.DLCod}`)}
+                            onClick={() => handleMoveToMachines(DLInfo.DLCod, DLInfo.DLNome)}
                         />
                     </>
                 }

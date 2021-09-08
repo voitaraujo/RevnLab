@@ -65,6 +65,7 @@ function Login(): JSX.Element {
         window.sessionStorage.setItem("token", response.data.user_token);
       response.data.user &&
         window.sessionStorage.setItem("user", response.data.user);
+      window.sessionStorage.setItem("ScreenDesc", "Depósitos");
 
       // history.push('/inventario')
       // aqui não da pra usar o history.push porque o sessionStorage não é sincrono(vou chegar em inventário mais rapido do que vou gravar o token no navegador, ai da erro na rota)
@@ -95,7 +96,15 @@ function Login(): JSX.Element {
             focus={true}
             disabled={wait}
           /> */}
-          <InputPhone disabled={wait} focus={true} label="Código de Acesso" mask='(##) # ####-####' onChange={handleUpdateUserCode} value={userCode} type='standard' />
+          <InputPhone
+            disabled={wait}
+            focus={true}
+            label="Código de Acesso"
+            mask="(##) # ####-####"
+            onChange={handleUpdateUserCode}
+            value={userCode}
+            type="standard"
+          />
           <InputSimple
             onChange={handleUpdateUserPassword}
             label="Senha"
