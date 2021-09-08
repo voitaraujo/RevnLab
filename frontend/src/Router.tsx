@@ -29,7 +29,7 @@ function InnerRoutes(): JSX.Element {
         
         <Route exact path="/maquinaDL/:DL" type="inner">
           <Machines />
-          <AppBar />
+          {/* <AppBar /> */}
         </Route>
 
         <PureRoute exact path="/unauthorized" render={() => <Unauthorized />} />
