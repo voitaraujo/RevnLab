@@ -1,41 +1,15 @@
-import React, { useState, useEffect } from "react";
-import moment from "moment";
+﻿import React, { useState, useEffect } from "react";
+
 import { useParams } from "react-router-dom";
 import { Toast } from "../../components/toasty";
 import { api } from "../../services/api";
 
 import { DataGrid, GridColDef } from "@material-ui/data-grid";
-import { InfoOutlined, ReceiptOutlined } from "@material-ui/icons";
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
-import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
-import MenuItem from "@material-ui/core/MenuItem";
-import Typography from "@material-ui/core/Typography";
-import Divider from "@material-ui/core/Divider";
 
-import { ClearButton } from "../../components/buttons";
-import {
-  DraggableDialogController,
-  FullScreenDialog,
-} from "../../components/dialogs";
-import { InputNumber } from "../../components/inputNumber";
-import { SelectControlled } from "../../components/select";
+import Details from './details'
 
 interface IParams {
   DL: string;
-}
-
-interface IInventario {
-  DLCod: string;
-  PROD: string;
-  SEL: string;
-  PRODUTO: string;
-  Qtd: number | string | null;
-  Refdt: string;
-  Filial: string;
-  CHAPA: string;
 }
 
 interface IMachines {
@@ -43,16 +17,6 @@ interface IMachines {
   CHAPA: string;
   Modelo: string;
   SERIE: string;
-}
-
-interface IDetalhes {
-  N1_ZZFILIA: string;
-  CHAPA: string;
-  SERIE: string;
-  CLICOD: string;
-  CLILJ: string;
-  DL: string;
-  Modelo: string;
 }
 
 interface IReferences {
@@ -68,12 +32,14 @@ interface LoadDTO {
 
 const Machines = (): JSX.Element => {
   const [machines, setMachines] = useState<IMachines[]>([]);
-  const [produtos, setProdutos] = useState<IInventario[]>([]);
   const [references, setReferences] = useState<IReferences[]>([]);
+<<<<<<< HEAD
   const [machineInfo, setMachineInfo] =
     useState<IDetalhes>(DetailsInitialState);
   const [open, setOpen] = useState(false);
   const [selectIndex, setSelectIndex] = useState("");
+=======
+>>>>>>> 1bf2bf5598c915d8a9f8dc698102d3ab4e932d13
 
   const FixedDtInicial = moment().startOf("month").format();
   const FixedDtFinal = moment().endOf("month").format();
@@ -109,18 +75,14 @@ const Machines = (): JSX.Element => {
       width: 90,
       align: "center",
       renderCell: (params) => (
-        <ClearButton
-          disabled={false}
-          label={<InfoOutlined />}
-          onClick={(event) => {
-            handleOpenDialog(params.row.CHAPA);
-          }}
+        <Details
+          chapa={params.row.CHAPA} DL={Params.DL} references={references}
         />
       ),
     },
   ];
 
-  //carrega a lista de máquinas do DL
+  //carrega a lista de máquinas do DL e referencias
   useEffect(() => {
     async function load() {
       try {
@@ -135,6 +97,7 @@ const Machines = (): JSX.Element => {
     load();
   }, [Params.DL]);
 
+<<<<<<< HEAD
   const handleChangeSelect = (index: number | unknown, CHAPA: string): void => {
     setSelectIndex(String(index));
     handleLoadInventory(CHAPA, references[Number(index)]);
@@ -323,14 +286,17 @@ const Machines = (): JSX.Element => {
       <Typography gutterBottom variant="h5">
         Máquinas no depósito "{Params.DL}"
       </Typography>
+=======
+  return (
+>>>>>>> 1bf2bf5598c915d8a9f8dc698102d3ab4e932d13
       <DataGrid
         columns={columns}
         rows={MachinesStateToTable(machines)}
-        pageSize={MachinesStateToTable(machines).length}
-        hideFooter={true}
+        pageSize={MachinesStateToTable(machines).length > 100 ? 100 : MachinesStateToTable(machines).length}
+        hideFooter={MachinesStateToTable(machines).length > 100 ? false : true}
         disableColumnMenu={true}
+        rowsPerPageOptions={[]}
       />
-    </>
   );
 };
 
@@ -349,14 +315,4 @@ const MachinesStateToTable = (Machines: IMachines[]): IMachines[] => {
   );
 
   return aux;
-};
-
-const DetailsInitialState = {
-  N1_ZZFILIA: "",
-  CHAPA: "",
-  SERIE: "",
-  CLICOD: "",
-  CLILJ: "",
-  DL: "",
-  Modelo: "",
 };

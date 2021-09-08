@@ -21,8 +21,7 @@ export default {
         const storages = verified && await getRepository(Storages).find({
             select: ['DLCod', 'DLNome', 'Filial'],
             where: {
-                GestorCod: verified.user_code,
-                DLStatus: 'S'
+                GestorCod: verified.user_code
             }
         })
 

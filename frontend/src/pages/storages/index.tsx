@@ -1,62 +1,17 @@
-import React, { useState, useEffect } from "react";
-import { useHistory } from "react-router-dom";
-import { api } from "../../services/api";
-import { DataGrid, GridColDef } from "@material-ui/data-grid";
-import moment from "moment";
+﻿import React, { useState, useEffect } from "react";
 
-import {
-  InfoOutlined,
-  AccountTreeOutlined,
-  ReceiptOutlined,
-} from "@material-ui/icons";
-
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemText from "@material-ui/core/ListItemText";
-import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
-import Divider from "@material-ui/core/Divider";
-import MenuItem from "@material-ui/core/MenuItem";
-import Typography from "@material-ui/core/Typography";
-
-import {
-  DraggableDialogController,
-  FullScreenDialog,
-} from "../../components/dialogs";
-import { ClearButton } from "../../components/buttons";
 import { Toast } from "../../components/toasty";
-import { InputNumber } from "../../components/inputNumber";
-import { SelectControlled } from "../../components/select";
+import { api } from "../../services/api";
 
-interface IInventario {
-  Refdt: string;
-  Filial: string;
-  DLCod: string;
-  PROD: string;
-  PRODUTO: string;
-  Qtd: number | string | null;
-}
+import { DataGrid, GridColDef } from "@material-ui/data-grid";
+
+import Details from './details'
 
 interface IDepositos {
   id?: string;
   DLCod: string;
   DLNome: string;
   Filial: string;
-}
-
-interface IDetalhes {
-  Filial: string;
-  DLCod: string;
-  GestorCod: string;
-  DLQtEq: number;
-  DLNome: string;
-  DLEndereco: string;
-  DLBairro: string;
-  DLCEP: string;
-  DLUF: string;
-  DLMunicipio: string;
-  DLMunicipioCod: string;
-  DLStatus: string;
-  DLLoja: string;
 }
 
 interface IReferences {
@@ -72,15 +27,14 @@ interface LoadDTO {
 
 const Storages = (): JSX.Element => {
   const [depositos, setDepositos] = useState<IDepositos[]>([]);
-  const [produtos, setProdutos] = useState<IInventario[]>([]);
   const [references, setReferences] = useState<IReferences[]>([]);
-  const [DLInfo, setDLInfo] = useState<IDetalhes>(DetailsInitialState);
-  const [open, setOpen] = useState(false);
-  const [selectIndex, setSelectIndex] = useState("");
 
+<<<<<<< HEAD
   const FixedDtInicial = moment().startOf("month").format();
   const FixedDtFinal = moment().endOf("month").format();
   const history = useHistory();
+=======
+>>>>>>> 1bf2bf5598c915d8a9f8dc698102d3ab4e932d13
   const columns: GridColDef[] = [
     {
       field: "id",
@@ -105,12 +59,8 @@ const Storages = (): JSX.Element => {
       width: 90,
       align: "center",
       renderCell: (params) => (
-        <ClearButton
-          disabled={false}
-          label={<InfoOutlined />}
-          onClick={(event) => {
-            handleOpenDialog(params.row.id, params.row.Filial);
-          }}
+        <Details
+          DL={params.row.id} Filial={params.row.Filial} references={references}
         />
       ),
     },
@@ -124,11 +74,11 @@ const Storages = (): JSX.Element => {
         setDepositos(response.data.storages);
         setReferences(response.data.references);
       } catch (err) {
-        window.sessionStorage.clear();
-        history.push("/");
+        Toast("Falha ao buscar as máquinas do depósito", "error");
       }
     }
     load();
+<<<<<<< HEAD
   }, [history]);
 
   const handleOpenDialog = (DLCOD: string, FILIAL: string) => {
@@ -344,34 +294,23 @@ const Storages = (): JSX.Element => {
         Depósitos
       </Typography>
 
+=======
+  }, []);
+
+  return (
+>>>>>>> 1bf2bf5598c915d8a9f8dc698102d3ab4e932d13
       <DataGrid
         columns={columns}
         rows={DepositoStateToTable(depositos)}
-        pageSize={DepositoStateToTable(depositos).length}
-        hideFooter={true}
+        pageSize={DepositoStateToTable(depositos).length > 100 ? 100 : DepositoStateToTable(depositos).length}
+        hideFooter={DepositoStateToTable(depositos).length > 100 ? false : true}
         disableColumnMenu={true}
+        rowsPerPageOptions={[]}
       />
-    </>
   );
 };
 
 export default Storages;
-
-const DetailsInitialState = {
-  Filial: "",
-  DLCod: "",
-  GestorCod: "",
-  DLQtEq: 0,
-  DLNome: "",
-  DLEndereco: "",
-  DLBairro: "",
-  DLCEP: "",
-  DLUF: "",
-  DLMunicipio: "",
-  DLMunicipioCod: "",
-  DLStatus: "",
-  DLLoja: "",
-};
 
 const DepositoStateToTable = (Depositos: IDepositos[]): IDepositos[] => {
   const aux: IDepositos[] = [];

@@ -1,4 +1,4 @@
-import jwt, { VerifyErrors } from 'jsonwebtoken'
+﻿import jwt, { VerifyErrors } from 'jsonwebtoken'
 import chalk from 'chalk';
 import { Request, Response } from 'express'
 
@@ -8,9 +8,7 @@ export const genToken = (user: string, name: string, role: "lider" | "adm") => {
             user_code: user.trim(),
             user_name: name.trim(),
             role: role.trim()
-        }, process.env.SALT_KEY!, {
-            expiresIn: '2h'
-        })
+        }, process.env.SALT_KEY!)
     } catch (err) {
         console.log(chalk.red(err))
     }
@@ -45,7 +43,7 @@ export const hasToken = (req: Request, res: Response, next: Function) => {
 
             //se chegar aqui o token provavelmente é válido, ai passamos pro próximo handler
             next()
-        } catch (err) {
+        } catch (err: any) {
 
             //retorno se o token for inválido por algum motivo
             res.status(400).send({

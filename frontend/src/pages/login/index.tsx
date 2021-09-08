@@ -15,6 +15,7 @@ import { Container } from "../../components/AbstractComponents";
 import { InputSimple } from "../../components/input";
 import { RED_PRIMARY } from "../../assets/colors";
 import { Toast } from "../../components/toasty";
+import { InputPhone } from "../../components/inputFormat";
 
 interface IAuthResponse {
   user_token?: string;
@@ -87,13 +88,14 @@ function Login(): JSX.Element {
           subheader="Login"
         />
         <CardContent>
-          <InputSimple
+          {/* <InputSimple
             onChange={handleUpdateUserCode}
             label="Código de Acesso"
             value={userCode}
             focus={true}
             disabled={wait}
-          />
+          /> */}
+          <InputPhone disabled={wait} focus={true} label="Código de Acesso" mask='(##) # ####-####' onChange={handleUpdateUserCode} value={userCode} type='standard' />
           <InputSimple
             onChange={handleUpdateUserPassword}
             label="Senha"

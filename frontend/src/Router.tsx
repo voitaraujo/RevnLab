@@ -6,10 +6,11 @@ import {
 } from "react-router-dom";
 
 import Route from "./components/privateRoute";
+import AppBar from './components/bottomAppBar'
+
 import Login from "./pages/login";
 import Storages from './pages/storages/index'
 import Machines from './pages/machines/index'
-
 import NotFound from "./pages/notFound";
 import Unauthorized from "./pages/unauthorized";
 
@@ -23,9 +24,12 @@ function InnerRoutes(): JSX.Element {
 
         <Route exact path="/inventario" type="inner">
           <Storages />
+          {/* <AppBar /> */}
         </Route>
+        
         <Route exact path="/maquinaDL/:DL" type="inner">
           <Machines />
+          {/* <AppBar /> */}
         </Route>
 
         <PureRoute exact path="/unauthorized" render={() => <Unauthorized />} />
