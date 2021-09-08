@@ -43,7 +43,7 @@ export const hasToken = (req: Request, res: Response, next: Function) => {
 
             //se chegar aqui o token provavelmente é válido, ai passamos pro próximo handler
             next()
-        } catch (err) {
+        } catch (err: any) {
 
             //retorno se o token for inválido por algum motivo
             res.status(400).send({
