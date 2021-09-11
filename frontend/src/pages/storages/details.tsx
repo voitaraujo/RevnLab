@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { useHistory } from "react-router-dom";
 import { api } from "../../services/api";
 
-import { AccountTreeOutlined, InfoOutlined, LaptopWindows } from "@material-ui/icons";
+import { AccountTreeOutlined, InfoOutlined } from "@material-ui/icons";
 import Typography from "@material-ui/core/Typography";
 
 import { DraggableDialogController } from "../../components/dialogs";
