@@ -1,4 +1,4 @@
-﻿import jwt, { VerifyErrors } from 'jsonwebtoken'
+﻿import jwt from 'jsonwebtoken'
 import chalk from 'chalk';
 import { Request, Response } from 'express'
 
