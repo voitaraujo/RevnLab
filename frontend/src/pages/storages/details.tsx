@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { useHistory } from "react-router-dom";
 import { api } from "../../services/api";
 
-import { AccountTreeOutlined, InfoOutlined, LaptopWindows } from "@material-ui/icons";
+import { AccountTreeOutlined, InfoOutlined } from "@material-ui/icons";
 import Typography from "@material-ui/core/Typography";
 
 import { DraggableDialogController } from "../../components/dialogs";
@@ -27,19 +27,12 @@ interface IDetalhes {
     DLLoja: string;
 }
 
-interface IReferences {
-    Refdt: string;
-    RefUd: string;
-    RefPdt: string;
-}
-
 interface IProps {
     DL: string
     Filial: string
-    references: IReferences[]
 }
 
-const Details = ({ DL, Filial, references }: IProps): JSX.Element => {
+const Details = ({ DL, Filial }: IProps): JSX.Element => {
     const [DLInfo, setDLInfo] = useState<IDetalhes>(DetailsInitialState);
     const [open, setOpen] = useState(false);
 
@@ -80,7 +73,7 @@ const Details = ({ DL, Filial, references }: IProps): JSX.Element => {
                 onClose={handleCloseDialog}
                 extraActions={
                     <>
-                        <Inventory Info={DLInfo} Refs={references} />
+                        <Inventory Info={DLInfo} />
                         <ClearButton
                             icon={<AccountTreeOutlined />}
                             label="Máquinas"

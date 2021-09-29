@@ -10,6 +10,7 @@ import Toolbar from "@material-ui/core/Toolbar";
 import IconButton from "@material-ui/core/IconButton";
 import Fab from "@material-ui/core/Fab";
 import Typography from "@material-ui/core/Typography";
+import Tooltip from "@material-ui/core/Tooltip";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -70,14 +71,24 @@ export default function BottomAppBar() {
           >
             <ExitToApp />
           </IconButton>
-          <Fab
-            color="secondary"
-            aria-label="add"
-            className={classes.fabButton}
-            onClick={() => returnToStorages()}
+          <Tooltip
+            title={
+              <label style={{ fontSize: "14px", lineHeight: "20px" }}>
+                Depósitos
+              </label>
+            }
+            placement="top"
+            arrow
           >
-            <Apartment />
-          </Fab>
+            <Fab
+              color="secondary"
+              aria-label="add"
+              className={classes.fabButton}
+              onClick={() => returnToStorages()}
+            >
+              <Apartment />
+            </Fab>
+          </Tooltip>
           <div className={classes.grow} />
           <Typography gutterBottom variant="inherit">
             {window.sessionStorage.getItem("ScreenDesc")}

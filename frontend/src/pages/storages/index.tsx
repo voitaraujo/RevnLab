@@ -14,20 +14,12 @@ interface IDepositos {
   Filial: string;
 }
 
-interface IReferences {
-  Refdt: string;
-  RefUd: string;
-  RefPdt: string;
-}
-
 interface LoadDTO {
   storages: IDepositos[];
-  references: IReferences[];
 }
 
 const Storages = (): JSX.Element => {
   const [depositos, setDepositos] = useState<IDepositos[]>([]);
-  const [references, setReferences] = useState<IReferences[]>([]);
 
   const columns: GridColDef[] = [
     {
@@ -54,7 +46,7 @@ const Storages = (): JSX.Element => {
       align: "center",
       renderCell: (params) => (
         <Details
-          DL={params.row.id} Filial={params.row.Filial} references={references}
+          DL={params.row.id} Filial={params.row.Filial}
         />
       ),
     },
@@ -66,7 +58,6 @@ const Storages = (): JSX.Element => {
         const response = await api.get<LoadDTO>(`/storages`);
 
         setDepositos(response.data.storages);
-        setReferences(response.data.references);
       } catch (err) {
         Toast("Falha ao buscar as máquinas do depósito", "error");
       }

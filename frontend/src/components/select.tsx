@@ -10,8 +10,9 @@ interface IProps {
   label: string;
   variant: "filled" | "outlined" | "standard";
   value: string;
-  children?: React.ReactNode
-  disabled?: boolean
+  children?: React.ReactNode;
+  disabled?: boolean;
+  enableVoidSelection: boolean;
 }
 
 export const SelectControlled = (props: IProps): JSX.Element => {
@@ -34,9 +35,11 @@ export const SelectControlled = (props: IProps): JSX.Element => {
         label={props.label}
         disabled={props.disabled}
       >
-        <MenuItem value="">
-          <em>Nenhuma</em>
-        </MenuItem>
+        {props.enableVoidSelection ? (
+          <MenuItem value="">
+            <em>Nenhuma</em>
+          </MenuItem>
+        ) : null}
         {props.children}
       </Select>
     </FormControl>
