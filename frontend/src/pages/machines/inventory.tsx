@@ -156,6 +156,7 @@ const Inventory = ({ Info, Refs, DLCod }: IProps): JSX.Element => {
                 disabled={true}
                 label="Referência"
                 variant="outlined"
+                enableVoidSelection={true}
             >
                 {Refs.map((ref, i) => (
                     <MenuItem value={i} key={i}>

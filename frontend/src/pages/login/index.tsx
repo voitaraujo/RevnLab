@@ -89,13 +89,6 @@ function Login(): JSX.Element {
           subheader="Login"
         />
         <CardContent>
-          {/* <InputSimple
-            onChange={handleUpdateUserCode}
-            label="Código de Acesso"
-            value={userCode}
-            focus={true}
-            disabled={wait}
-          /> */}
           <InputPhone
             disabled={wait}
             focus={true}

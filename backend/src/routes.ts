@@ -6,6 +6,7 @@ import StoragesController from './controllers/StoragesController';
 import MachinesController from './controllers/MachinesController';
 import StoragesMovController from './controllers/StoragesMovController';
 import MachinesMovController from './controllers/MachinesMovController';
+import InvMovController from './controllers/InvMovController';
 
 const routes = Router();
 
@@ -28,6 +29,9 @@ routes.put('/inventory/storages/', hasToken, StoragesMovController.Update);
 //Movimentação das máquinas
 routes.get('/inventory/machines/:DL/:Chapa/:PD/:UD', hasToken, MachinesMovController.See);
 routes.put('/inventory/machines/', hasToken, MachinesMovController.Update);
+
+//Referencias/Controle
+routes.get('/references/storages/:DL', hasToken, InvMovController.Show);
 
 
 export default routes;
