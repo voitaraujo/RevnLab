@@ -16,10 +16,9 @@ export const Loading = () => {
       }}
     >
       <ReactLoading
-        type="spinningBubbles"
+        type="spin"
         color={RED_PRIMARY}
-        height="10%"
-        width="10%"
+        width="3rem"
       />
     </div>
   );

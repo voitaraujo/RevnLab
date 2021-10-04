@@ -42,51 +42,56 @@ interface IDetalhes {
   DLLoja: string;
 }
 
-interface IProps {
-  Info: IDetalhes;
+interface Refs {
+  DLCod: string,
+  Refdt: string,
+  InvMovSeq: number,
+  InvMovStaus: number
 }
 
-const Inventory = ({ Info }: IProps): JSX.Element => {
+interface IProps {
+  Info: IDetalhes;
+  Refs: Refs[];
+}
+
+export const Inventory = ({ Info, Refs }: IProps): JSX.Element => {
   const [produtos, setProdutos] = useState<IInventario[]>([]);
-  const [buscando, setBuscando] = useState<boolean>(true);
+  const [fetching, setFetching] = useState<boolean>(false);
   const [tipo, setTipo] = useState<string>("INSUMOS");
-  const [selectedRef, setSelectedRef] = useState();
+  const [selectedRef, setSelectedRef] = useState('');
 
-  //   useEffect(() => loadInventoryDetails(Info.DLCod, Info.Filial, X, Y))
-
-  const handleOpen = async (DLCOD: string, FILIAL: string) => {
-    let FixedDtInicial = moment()
-      .subtract(1, "months")
-      .startOf("month")
-      .format();
-    let FixedDtFinal = moment().subtract(1, "months").endOf("month").format();
-
-    loadInventoryDetails(DLCOD, FILIAL, FixedDtInicial, FixedDtFinal);
-  };
+  useEffect(() => {
+    if (selectedRef !== '' && tipo !== '' && Info.Filial !== '' && Info.DLCod !== '') {
+      loadInventoryDetails(Info.DLCod, Info.Filial, tipo, selectedRef)
+    } else {
+      setProdutos([])
+    }
+  }, [Info.DLCod, Info.Filial, tipo, selectedRef])
 
   const loadInventoryDetails = async (
     DLCOD: string,
     FILIAL: string,
-    InitialDate: string,
-    finalDate: string
+    Category: string,
+    Refdt: string,
   ) => {
+    setFetching(true);
     try {
       const response = await api.get<IInventario[]>(
-        `/inventory/storages/${DLCOD}/${FILIAL}/${InitialDate}/${finalDate}`
+        `/inventory/storages/${DLCOD}/${FILIAL}/${Category}/${moment(Refdt).format('YYYY-MM-DD')}/`
       );
 
       setProdutos(response.data);
-      setBuscando(false);
+      setFetching(false);
     } catch (err) {
-      Toast("Falha ao carregar inventário", "error");
-      setBuscando(false);
+      Toast("Não foi possivel carregar o inventário do depósito", "error");
+      setFetching(false);
     }
   };
 
   const handleClose = () => {
     setProdutos([]);
-    setBuscando(true);
-    // setSelectIndex("");
+    setFetching(false);
+    setSelectedRef('')
   };
 
   const handleValueChange = (
@@ -101,11 +106,11 @@ const Inventory = ({ Info }: IProps): JSX.Element => {
   };
 
   const handleSubmit = async (): Promise<boolean> => {
-    let test = true;
+    let shouldCloseModal = true;
 
     if (produtos.length === 0) {
       Toast("Inventário vazio", "default");
-      test = false;
+      shouldCloseModal = false;
     }
 
     for (let i = 0; i < produtos.length; i++) {
@@ -118,12 +123,12 @@ const Inventory = ({ Info }: IProps): JSX.Element => {
           "Qtd. de um ou mais itens do inventário não informados",
           "default"
         );
-        test = false;
+        shouldCloseModal = false;
         break;
       }
     }
 
-    if (test) {
+    if (shouldCloseModal) {
       try {
         await api.put(`/inventory/storages/`, {
           inventario: produtos,
@@ -132,11 +137,11 @@ const Inventory = ({ Info }: IProps): JSX.Element => {
         Toast("Inventário salvo com sucesso", "success");
       } catch (err) {
         Toast("Falha ao salvar inventário", "error");
-        test = false;
+        shouldCloseModal = false;
       }
     }
 
-    return test;
+    return shouldCloseModal;
   };
 
   return (
@@ -147,22 +152,24 @@ const Inventory = ({ Info }: IProps): JSX.Element => {
       buttonColor="primary"
       buttonType="text"
       onConfirm={handleSubmit}
-      onOpen={() => handleOpen(Info.DLCod, Info.Filial)}
       onClose={handleClose}
     >
       <SelectControlled
-        value={String(moment().subtract(1, "months").month())}
-        disabled={true}
-        label="Referencia"
+        value={selectedRef}
+        onChange={e => setSelectedRef(String(e.target.value))}
+        disabled={fetching}
+        label="Referência"
         variant="outlined"
         enableVoidSelection={true}
       >
-        <MenuItem value="7">PLACEHOLDER_REF_ESTÁTICO</MenuItem>
+        {Refs.map(ref => (
+          <MenuItem value={ref.Refdt} key={ref.Refdt}>{moment(ref.Refdt).format('L')}</MenuItem>
+        ))}
       </SelectControlled>
       <SelectControlled
         value={tipo}
         onChange={(e) => setTipo(String(e.target.value))}
-        disabled={false}
+        disabled={fetching}
         label="Categoria"
         variant="outlined"
         enableVoidSelection={false}
@@ -170,7 +177,7 @@ const Inventory = ({ Info }: IProps): JSX.Element => {
         <MenuItem value="INSUMOS">INSUMOS</MenuItem>
         <MenuItem value="SNACKS">SNACKS</MenuItem>
       </SelectControlled>
-      {buscando ? (
+      {fetching ? (
         <Loading />
       ) : (
         <List>
@@ -217,5 +224,3 @@ const Inventory = ({ Info }: IProps): JSX.Element => {
     </FullScreenDialog>
   );
 };
-
-export default Inventory;

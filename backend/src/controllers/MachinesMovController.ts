@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { getRepository, Between, getConnection } from 'typeorm';
+import { getRepository, getConnection } from 'typeorm';
 import moment from 'moment';
 
 import { MovMachines } from '../entity/MovMachines'
@@ -31,8 +31,8 @@ export default {
         const token = req.get('Authorization')
         const Chapa = req.params.Chapa
         const DLid = req.params.DL
-        const PD = req.params.PD
-        const UD = req.params.UD
+        const Category = req.params.Category
+        const Refdt = req.params.Refdt
 
         const verified = <IToken>decryptToken(token!)
 
@@ -42,7 +42,7 @@ export default {
                 CHAPA: Chapa,
                 DLCod: DLid,
                 GestorCod: verified.user_code,
-                Refdt: Between(new Date(PD), new Date(UD))
+                Refdt: Refdt
             }
         })
 

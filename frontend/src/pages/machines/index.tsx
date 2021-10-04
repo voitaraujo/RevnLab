@@ -1,38 +1,42 @@
 ﻿import React, { useState, useEffect } from "react";
+import { connect } from 'react-redux';
+import { bindActionCreators, Dispatch } from 'redux';
 
 import { useParams } from "react-router-dom";
 import { Toast } from "../../components/toasty";
 import { api } from "../../services/api";
 
+import { InfoOutlined } from "@material-ui/icons";
 import { DataGrid, GridColDef } from "@material-ui/data-grid";
 
-import Details from './details'
+import { Details } from './details'
+import { Loading } from "../../components/loading";
+import { ClearButton } from '../../components/buttons'
+
+import { IMachines, IStore, IMachinesState } from '../../global/reducer/MachineReducerInterfaces'
+import { SetMachinesList, SetDialogState } from '../../global/actions/MachineActions'
 
 interface IParams {
   DL: string;
 }
 
-interface IMachines {
-  id?: string;
-  CHAPA: string;
-  Modelo: string;
-  SERIE: string;
-}
-
-interface IReferences {
-  Refdt: string;
-  RefUd: string;
-  RefPdt: string;
-}
-
 interface LoadDTO {
   machines: IMachines[];
-  references: IReferences[];
 }
 
-const Machines = (): JSX.Element => {
-  const [machines, setMachines] = useState<IMachines[]>([]);
-  const [references, setReferences] = useState<IReferences[]>([]);
+interface IPropsFromRedux {
+  SetDialogState: (value: boolean) => void,
+  SetMachinesList: (value: IMachines[]) => void,
+  State: IMachinesState
+}
+
+interface IProps { }
+
+type IPropsWithRedux = IProps & IPropsFromRedux
+
+const MachinesWithRedux = ({ State, SetMachinesList, SetDialogState }: IPropsWithRedux): JSX.Element => {
+  const [fetching, setFetching] = useState<boolean>(true);
+  const [chapaTarget, setChapaTarget] = useState<string>('');
 
   const Params = useParams<IParams>();
   const columns: GridColDef[] = [
@@ -66,12 +70,19 @@ const Machines = (): JSX.Element => {
       width: 90,
       align: "center",
       renderCell: (params) => (
-        <Details
-          chapa={params.row.CHAPA} DL={Params.DL} references={references}
+        <ClearButton
+          disabled={false}
+          label={<InfoOutlined />}
+          onClick={() => handleOpenMachineDetails(String(params.id))}
         />
       ),
     },
   ];
+
+  const handleOpenMachineDetails = (CHAPA: string) => {
+    setChapaTarget(CHAPA)
+    SetDialogState(true)
+  }
 
   //carrega a lista de máquinas do DL e referencias
   useEffect(() => {
@@ -79,29 +90,62 @@ const Machines = (): JSX.Element => {
       try {
         const response = await api.get<LoadDTO>(`/machines/${Params.DL}`);
 
-        setReferences(response.data.references);
-        setMachines(response.data.machines);
+        SetMachinesList(MachinesStateToTable(response.data.machines));
+        setFetching(false)
       } catch (err) {
         Toast("Falha ao buscar as máquinas do depósito", "error");
+        setFetching(false)
       }
     }
     load();
-  }, [Params.DL]);
+  }, [Params.DL, SetMachinesList]);
 
-  return (
+  return fetching ? (
+    <Loading />
+  ) : (
+    <>
+      <Details DLCod={Params.DL} Chapa={chapaTarget} />
       <DataGrid
         style={{ height: 'calc(100% - 64px)' }}
         columns={columns}
-        rows={MachinesStateToTable(machines)}
-        pageSize={MachinesStateToTable(machines).length > 100 ? 100 : MachinesStateToTable(machines).length}
-        hideFooter={MachinesStateToTable(machines).length > 100 ? false : true}
+        rows={State.Machines}
+        pageSize={State.Machines.length > 100 ? 100 : State.Machines.length}
+        hideFooter={State.Machines.length > 100 ? false : true}
         disableColumnMenu={true}
         rowsPerPageOptions={[]}
       />
+    </>
   );
 };
 
-export default Machines;
+const mapStateToProps = (store: IStore) => ({
+  State: store.MachinesState
+})
+
+const mapDispatchToProps = (dispatch: Dispatch<{ type: string }>) =>
+  bindActionCreators(
+    {
+      SetDialogState,
+      SetMachinesList
+    }
+    , dispatch)
+
+
+export const Machines = connect<{
+  State: IMachinesState
+},
+  {
+    SetDialogState: (value: boolean) => {
+      type: string;
+      value: boolean;
+    };
+    SetMachinesList: (value: IMachines[]) => {
+      type: string;
+      value: IMachines[];
+    };
+  },
+  {},
+  IStore>(mapStateToProps, mapDispatchToProps)(MachinesWithRedux);
 
 const MachinesStateToTable = (Machines: IMachines[]): IMachines[] => {
   const aux: IMachines[] = [];

@@ -5,10 +5,11 @@ import { api } from "../../services/api";
 import { AccountTreeOutlined, InfoOutlined } from "@material-ui/icons";
 import Typography from "@material-ui/core/Typography";
 
-import { DraggableDialogController } from "../../components/dialogs";
+import { DraggableDialogControlled } from "../../components/dialogs";
 import { ClearButton } from "../../components/buttons";
 import { Toast } from "../../components/toasty";
-import Inventory from './inventory'
+import { Inventory } from './inventory'
+import { Loading } from "../../components/loading";
 
 
 interface IDetalhes {
@@ -27,6 +28,13 @@ interface IDetalhes {
     DLLoja: string;
 }
 
+interface Refs {
+    DLCod: string,
+    Refdt: string,
+    InvMovSeq: number,
+    InvMovStaus: number
+}
+
 interface IProps {
     DL: string
     Filial: string
@@ -34,6 +42,8 @@ interface IProps {
 
 const Details = ({ DL, Filial }: IProps): JSX.Element => {
     const [DLInfo, setDLInfo] = useState<IDetalhes>(DetailsInitialState);
+    const [fetching, setFetching] = useState<boolean>(true);
+    const [refs, setRefs] = useState<Refs[]>([])
     const [open, setOpen] = useState(false);
 
     const history = useHistory();
@@ -41,9 +51,12 @@ const Details = ({ DL, Filial }: IProps): JSX.Element => {
     const handleOpen = async (DLCOD: string, FILIAL: string) => {
         setOpen(true)
         try {
-            const response = await api.get(`/storages/${FILIAL}/${DLCOD}`);
+            const responseDepInfo = await api.get<IDetalhes[]>(`/storages/${FILIAL}/${DLCOD}`);
+            const responseDepRefs = await api.get<{ Refs: Refs[] }>(`/references/storages/${DLCOD}`)
 
-            setDLInfo(response.data[0]);
+            setDLInfo(responseDepInfo.data[0]);
+            setRefs(responseDepRefs.data.Refs);
+            setFetching(false)
         } catch (err) {
             Toast("Não foi possivel trazer as informações do depósito", "error");
         }
@@ -52,6 +65,7 @@ const Details = ({ DL, Filial }: IProps): JSX.Element => {
     const handleCloseDialog = () => {
         setOpen(false);
         setDLInfo(DetailsInitialState);
+        setFetching(true)
     };
 
     const handleMoveToMachines = (DLCOD: string, DLNAME: string) => {
@@ -67,13 +81,13 @@ const Details = ({ DL, Filial }: IProps): JSX.Element => {
                 onClick={() => handleOpen(DL, Filial)}
             />
 
-            <DraggableDialogController
+            <DraggableDialogControlled
                 open={open}
                 title={`Depósito ${DLInfo.DLNome}`}
                 onClose={handleCloseDialog}
                 extraActions={
                     <>
-                        <Inventory Info={DLInfo} />
+                        <Inventory Info={DLInfo} Refs={refs} />
                         <ClearButton
                             icon={<AccountTreeOutlined />}
                             label="Máquinas"
@@ -82,27 +96,32 @@ const Details = ({ DL, Filial }: IProps): JSX.Element => {
                         />
                     </>
                 }
-            >
-                <Typography gutterBottom variant="subtitle1">
-                    Endereço: <strong>{DLInfo.DLEndereco}</strong>
-                </Typography>
-                <Typography gutterBottom variant="subtitle1">
-                    Bairro: <strong>{DLInfo.DLBairro}</strong>
-                </Typography>
-                <Typography gutterBottom variant="subtitle1">
-                    Município:{" "}
-                    <strong>
-                        {DLInfo.DLMunicipio} - {DLInfo.DLUF}
-                    </strong>
-                </Typography>
-                <Typography gutterBottom variant="subtitle1">
-                    CEP: <strong>{DLInfo.DLCEP}</strong>
-                </Typography>
-                <br />
-                <Typography gutterBottom variant="subtitle1">
-                    Equipamentos no DL: <strong>{DLInfo.DLQtEq}</strong>
-                </Typography>
-            </DraggableDialogController>
+            >{fetching ? <Loading /> : (
+                <>
+                    <Typography gutterBottom variant="subtitle1">
+                        Endereço: <strong>{DLInfo.DLEndereco}</strong>
+                    </Typography>
+                    <Typography gutterBottom variant="subtitle1">
+                        Bairro: <strong>{DLInfo.DLBairro}</strong>
+                    </Typography>
+                    <Typography gutterBottom variant="subtitle1">
+                        Município:{" "}
+                        <strong>
+                            {DLInfo.DLMunicipio} - {DLInfo.DLUF}
+                        </strong>
+                    </Typography>
+                    <Typography gutterBottom variant="subtitle1">
+                        CEP: <strong>{DLInfo.DLCEP}</strong>
+                    </Typography>
+                    <br />
+                    <Typography gutterBottom variant="subtitle1">
+                        Equipamentos no Depósito: <strong>{DLInfo.DLQtEq}</strong>
+                    </Typography>
+                </>
+            )
+                }
+
+            </DraggableDialogControlled>
         </>
     )
 }

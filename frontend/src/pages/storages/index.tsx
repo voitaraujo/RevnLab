@@ -6,6 +6,7 @@ import { api } from "../../services/api";
 import { DataGrid, GridColDef } from "@material-ui/data-grid";
 
 import Details from './details'
+import { Loading } from "../../components/loading";
 
 interface IDepositos {
   id?: string;
@@ -20,6 +21,7 @@ interface LoadDTO {
 
 const Storages = (): JSX.Element => {
   const [depositos, setDepositos] = useState<IDepositos[]>([]);
+  const [fetching, setFetching] = useState<boolean>(true);
 
   const columns: GridColDef[] = [
     {
@@ -58,23 +60,27 @@ const Storages = (): JSX.Element => {
         const response = await api.get<LoadDTO>(`/storages`);
 
         setDepositos(response.data.storages);
+        setFetching(false)
       } catch (err) {
         Toast("Falha ao buscar as máquinas do depósito", "error");
+        setFetching(false)
       }
     }
     load();
   }, []);
 
-  return (
-      <DataGrid
-        style={{ height: 'calc(100% - 64px)' }}
-        columns={columns}
-        rows={DepositoStateToTable(depositos)}
-        pageSize={DepositoStateToTable(depositos).length > 100 ? 100 : DepositoStateToTable(depositos).length}
-        hideFooter={DepositoStateToTable(depositos).length > 100 ? false : true}
-        disableColumnMenu={true}
-        rowsPerPageOptions={[]}
-      />
+  return fetching ? (
+    <Loading />
+  ) : (
+    <DataGrid
+      style={{ height: 'calc(100% - 64px)' }}
+      columns={columns}
+      rows={DepositoStateToTable(depositos)}
+      pageSize={DepositoStateToTable(depositos).length > 100 ? 100 : DepositoStateToTable(depositos).length}
+      hideFooter={DepositoStateToTable(depositos).length > 100 ? false : true}
+      disableColumnMenu={true}
+      rowsPerPageOptions={[]}
+    />
   );
 };
 

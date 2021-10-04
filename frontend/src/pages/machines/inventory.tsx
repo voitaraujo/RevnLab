@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import moment from "moment";
 import { api } from "../../services/api";
 
@@ -13,200 +13,214 @@ import Divider from "@material-ui/core/Divider";
 import Typography from "@material-ui/core/Typography";
 
 import {
-    FullScreenDialog
+  FullScreenDialog
 } from "../../components/dialogs";
 import { InputNumber } from "../../components/inputFormat";
 import { SelectControlled } from "../../components/select";
 import { Toast } from "../../components/toasty";
-
-interface IProps {
-    Info: IDetalhes
-    Refs: IReferences[]
-    DLCod: string
-}
-
-interface IReferences {
-    Refdt: string;
-    RefUd: string;
-    RefPdt: string;
-}
+import { Loading } from "../../components/loading";
 
 interface IDetalhes {
-    N1_ZZFILIA: string;
-    CHAPA: string;
-    SERIE: string;
-    CLICOD: string;
-    CLILJ: string;
-    DL: string;
-    Modelo: string;
+  N1_ZZFILIA: string;
+  CHAPA: string;
+  SERIE: string;
+  CLICOD: string;
+  CLILJ: string;
+  DL: string;
+  Modelo: string;
 }
-
 interface IInventario {
-    DLCod: string;
-    PROD: string;
-    SEL: string;
-    PRODUTO: string;
-    Qtd: number | string | null;
-    Refdt: string;
-    Filial: string;
-    CHAPA: string;
+  DLCod: string;
+  PROD: string;
+  SEL: string;
+  PRODUTO: string;
+  Qtd: number | string | null;
+  Refdt: string;
+  Filial: string;
+  CHAPA: string;
+}
+interface Refs {
+  DLCod: string,
+  Refdt: string,
+  InvMovSeq: number,
+  InvMovStaus: number
+}
+interface IProps {
+  Info: IDetalhes
+  DLCod: string
+  Refs: Refs[]
 }
 
-const Inventory = ({ Info, Refs, DLCod }: IProps): JSX.Element => {
-    const [produtos, setProdutos] = useState<IInventario[]>([]);
-    // const [selectIndex, setSelectIndex] = useState("");
+export const Inventory = ({ Info, DLCod, Refs }: IProps): JSX.Element => {
+  const [produtos, setProdutos] = useState<IInventario[]>([]);
+  const [fetching, setFetching] = useState<boolean>(false);
+  const [tipo, setTipo] = useState<string>("SNACKS");
+  const [selectedRef, setSelectedRef] = useState('');
 
-    const FixedDtInicial = moment().subtract(1, 'months').startOf("month").format();
-    const FixedDtFinal = moment().subtract(1, 'months').endOf("month").format();
+  useEffect(() => {
+    if (Info.CHAPA !== '' && DLCod !== '' && tipo !== '' && selectedRef !== '') {
+      loadInventoryDetails(Info.CHAPA, DLCod, tipo, selectedRef)
+    } else {
+      setProdutos([])
+    }
+  }, [Info.CHAPA, DLCod, tipo, selectedRef])
 
+  const loadInventoryDetails = async (
+    CHAPA: string,
+    DL: string,
+    Category: string,
+    Refdt: string
+  ) => {
+    setFetching(true);
+    try {
+      const response = await api.get<IInventario[]>(
+        `/inventory/machines/${DL}/${CHAPA}/${Category}/${moment(Refdt).format('YYYY-MM-DD')}`
+      );
 
-    const handleOpen = async (CHAPA: string, DL: string, Ref?: IReferences) => {
-        // setSelectIndex("");
-        try {
-            // const response = await api.get<IInventario[]>(
-            //   `/inventory/machines/${DL}/${CHAPA}/${Ref.RefPdt}/${Ref.RefUd}`
-            // );
-            const response = await api.get<IInventario[]>(
-                `/inventory/machines/${DL}/${CHAPA}/${FixedDtInicial}/${FixedDtFinal}`
-            );
+      setProdutos(response.data);
+      setFetching(false);
+    } catch (err) {
+      Toast("Não foi possivel carregar o inventário da máquina", "error");
+      setFetching(false);
+    }
+  }
 
-            setProdutos(response.data);
-        } catch (err) {
-            Toast("Não foi possivel carregar o inventário da máquina", "error");
-        }
-    };
+  const handleClose = () => {
+    setProdutos([])
+    setFetching(false);
+    setSelectedRef('')
+  }
 
-    const handleClose = () => {
-        setProdutos([])
-        // setSelectIndex("");
+  const handleValueChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    index: number
+  ): void => {
+    const aux = [...produtos];
+
+    aux[index].Qtd = event.target.value;
+
+    setProdutos(aux);
+  };
+
+  const handleSubmit = async (): Promise<boolean> => {
+    let shouldCloseModal = true;
+
+    if (produtos.length === 0) {
+      Toast("Inventário vazio", "default");
+      shouldCloseModal = false;
     }
 
-    // const handleChangeSelect = (index: number | unknown, CHAPA: string): void => {
-    //     setSelectIndex(String(index));
-    //     handleOpen(CHAPA, DLCod, Refs[Number(index)]);
-    // };
+    for (let i = 0; i < produtos.length; i++) {
+      if (
+        produtos[i].Qtd === "" ||
+        produtos[i].Qtd === null ||
+        typeof produtos[i].Qtd == "undefined"
+      ) {
+        Toast(
+          "Qtd. de um ou mais itens do inventário não informados",
+          "default"
+        );
+        shouldCloseModal = false;
+        break;
+      }
+    }
 
-    const handleValueChange = (
-        event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-        index: number
-    ): void => {
-        const aux = [...produtos];
+    if (shouldCloseModal) {
+      try {
+        await api.put(`/inventory/machines/`, {
+          inventario: produtos,
+        });
 
-        aux[index].Qtd = event.target.value;
+        Toast("Inventário salvo com sucesso", "success");
+      } catch (err) {
+        Toast("Falha ao salvar inventário", "error");
+        shouldCloseModal = false;
+      }
+    }
 
-        setProdutos(aux);
-    };
+    return shouldCloseModal;
+  };
 
-    const handleSubmit = async (): Promise<boolean> => {
-        let test = true;
-
-        if (produtos.length === 0) {
-            Toast("Inventário vazio", "default");
-            test = false;
+  return (
+    <FullScreenDialog
+      title={`Inventário do ativo ${Info.CHAPA}`}
+      buttonIcon={<ReceiptOutlined />}
+      buttonLabel="Inventário"
+      buttonColor="primary"
+      buttonType="text"
+      onConfirm={handleSubmit}
+      onClose={handleClose}
+    >
+      <SelectControlled
+        value={selectedRef}
+        onChange={e => {
+          setSelectedRef(String(e.target.value))}
         }
-
-        for (let i = 0; i < produtos.length; i++) {
-            if (
-                produtos[i].Qtd === "" ||
-                produtos[i].Qtd === null ||
-                typeof produtos[i].Qtd == "undefined"
-            ) {
-                Toast(
-                    "Qtd. de um ou mais itens do inventário não informados",
-                    "default"
-                );
-                test = false;
-                break;
-            }
+        disabled={fetching}
+        label="Referência"
+        variant="outlined"
+        enableVoidSelection={true}
+      >
+        {Refs.map(ref => (
+          <MenuItem value={ref.Refdt} key={ref.Refdt}>{moment(ref.Refdt).format('L')}</MenuItem>
+        ))}
+      </SelectControlled>
+      <SelectControlled
+        value={tipo}
+        onChange={(e) => {
+          setTipo(String(e.target.value))}
         }
-
-        if (test) {
-            try {
-                await api.put(`/inventory/machines/`, {
-                    inventario: produtos,
-                });
-
-                Toast("Inventário salvo com sucesso", "success");
-            } catch (err) {
-                Toast("Falha ao salvar inventário", "error");
-                test = false;
-            }
-        }
-
-        return test;
-    };
-
-    return (
-        <FullScreenDialog
-            title={`Inventário do ativo ${Info.CHAPA}`}
-            buttonIcon={<ReceiptOutlined />}
-            buttonLabel="Inventário"
-            buttonColor="primary"
-            buttonType="text"
-            onConfirm={handleSubmit}
-            onOpen={() => handleOpen(Info.CHAPA, DLCod)}
-            onClose={handleClose}
-        >
-            <SelectControlled
-                // value={selectIndex}
-                value={String(moment().subtract(1, 'months').month())}
-                // onChange={(event) =>
-                //   handleChangeSelect(event.target.value, machineInfo.CHAPA)
-                // }
-                disabled={true}
-                label="Referência"
-                variant="outlined"
-                enableVoidSelection={true}
-            >
-                {Refs.map((ref, i) => (
-                    <MenuItem value={i} key={i}>
-                        {moment(ref.RefPdt).format("L")}
-                    </MenuItem>
-                ))}
-            </SelectControlled>
-            <List>
-                {produtos.length === 0 ? (
-                    <div
-                        style={{
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
-                        }}
-                    >
-                        <Typography gutterBottom variant="h6">
-                            Nenhum produto à exibir.
-                        </Typography>
-                    </div>
-                ) : (
-                    produtos.map((item, i) => (
-                        <div key={`${item.PROD}${i}`}>
-                            <ListItem>
-                                <ListItemIcon>{item.SEL}</ListItemIcon>
-                                <ListItemText
-                                    primary={item.PRODUTO}
-                                    secondary={`Código: ${item.PROD}`}
-                                />
-                                <ListItemSecondaryAction
-                                    style={{ width: "10%", minWidth: "100px" }}
-                                >
-                                    <InputNumber
-                                        decimals={0}
-                                        onChange={(event) => handleValueChange(event, i)}
-                                        disabled={false}
-                                        label="Qtd"
-                                        value={item.Qtd}
-                                        type="outlined"
-                                        focus={false}
-                                    />
-                                </ListItemSecondaryAction>
-                            </ListItem>
-                            <Divider />
-                        </div>
-                    ))
-                )}
-            </List>
-        </FullScreenDialog>
-    )
+        disabled={true}
+        label="Categoria"
+        variant="outlined"
+        enableVoidSelection={false}
+      >
+        <MenuItem value="SNACKS">SNACKS</MenuItem>
+      </SelectControlled>
+      {fetching ? (
+        <Loading />
+      ) : (<List>
+        {produtos.length === 0 ? (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Typography gutterBottom variant="h6">
+              Nenhum produto à exibir.
+            </Typography>
+          </div>
+        ) : (
+          produtos.map((item, i) => (
+            <div key={item.SEL}>
+              <ListItem>
+                <ListItemIcon>{item.SEL}</ListItemIcon>
+                <ListItemText
+                  primary={item.PRODUTO}
+                  secondary={`Código: ${item.PROD}`}
+                />
+                <ListItemSecondaryAction
+                  style={{ width: "10%", minWidth: "100px" }}
+                >
+                  <InputNumber
+                    decimals={0}
+                    onChange={(event) => handleValueChange(event, i)}
+                    disabled={false}
+                    label="Qtd"
+                    value={item.Qtd}
+                    type="outlined"
+                    focus={false}
+                  />
+                </ListItemSecondaryAction>
+              </ListItem>
+              <Divider />
+            </div>
+          ))
+        )}
+      </List>
+      )}
+    </FullScreenDialog>
+  )
 }
-
-export default Inventory

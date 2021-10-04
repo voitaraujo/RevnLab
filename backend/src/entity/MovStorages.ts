@@ -41,4 +41,10 @@ export class MovStorages {
         type: 'decimal'
     })
     Qtd!: number;
+
+    @Column({
+        type: 'varchar',
+        length: 1
+    })
+    Tipo!: string;
 }

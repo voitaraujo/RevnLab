@@ -23,15 +23,15 @@ routes.get('/machines/:DL', hasToken, MachinesController.Show);
 routes.get('/machines/details/:DL/:CHAPA', hasToken, MachinesController.See);
 
 //Movimentação dos depósitos
-routes.get('/inventory/storages/:DL/:FILIAL/:PD/:UD', hasToken, StoragesMovController.See);
+routes.get('/inventory/storages/:DL/:FILIAL/:Category/:Refdt', hasToken, StoragesMovController.See);
 routes.put('/inventory/storages/', hasToken, StoragesMovController.Update);
 
 //Movimentação das máquinas
-routes.get('/inventory/machines/:DL/:Chapa/:PD/:UD', hasToken, MachinesMovController.See);
+routes.get('/inventory/machines/:DL/:Chapa/:Category/:Refdt', hasToken, MachinesMovController.See);
 routes.put('/inventory/machines/', hasToken, MachinesMovController.Update);
 
 //Referencias/Controle
-routes.get('/references/storages/:DL', hasToken, InvMovController.Show);
+routes.get('/references/storages/:DL', hasToken, InvMovController.See);
 
 
 export default routes;

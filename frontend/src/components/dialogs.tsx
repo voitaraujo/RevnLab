@@ -18,7 +18,6 @@ import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import CloseIcon from '@material-ui/icons/Close';
 
-
 interface IProps {
   children: React.ReactNode,
   title: string,
@@ -29,10 +28,11 @@ interface IProps {
 }
 
 interface IPropsUncontrolled extends IProps {
-  buttonLabel?: string | React.ReactElement,
-  buttonIcon?: React.ReactElement,
-  buttonType?: 'contained' | 'outlined' | 'text',
+  buttonLabel?: string | React.ReactElement
+  buttonIcon?: React.ReactElement
+  buttonType?: 'contained' | 'outlined' | 'text'
   buttonColor?: 'primary' | 'secondary'
+  disabled?: boolean
 }
 
 interface IPropsControlled extends IProps {
@@ -94,15 +94,15 @@ export const DraggableDialog = (props: IPropsUncontrolled) => {
 
 export const FullScreenDialog = (props: IPropsUncontrolled) => {
   const classes = useStyles();
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = React.useState(false)
 
   const handleClickOpen = () => {
-    setOpen(true);
+    setOpen(true)
     props.onOpen && props.onOpen()
   };
 
   const handleClose = () => {
-    setOpen(false);
+    setOpen(false)
     props.onClose && props.onClose()
   };
 
@@ -117,7 +117,7 @@ export const FullScreenDialog = (props: IPropsUncontrolled) => {
 
   return (
     <div>
-      <Button startIcon={props.buttonIcon} variant={props.buttonType} color={props.buttonColor} onClick={handleClickOpen}>
+      <Button disabled={props.disabled} startIcon={props.buttonIcon} variant={props.buttonType} color={props.buttonColor} onClick={handleClickOpen}>
         {props.buttonLabel}
       </Button>
       <Dialog fullScreen open={open} onClose={handleClose} scroll='paper' TransitionComponent={SlideTransition}>
@@ -145,7 +145,7 @@ export const FullScreenDialog = (props: IPropsUncontrolled) => {
   );
 }
 
-export const DraggableDialogController = (props: IPropsControlled) => {
+export const DraggableDialogControlled = (props: IPropsControlled) => {
   const { open } = props
 
   const handleClose = () => {

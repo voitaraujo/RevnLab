@@ -21,11 +21,12 @@ type IProps = {
   focus: boolean
 }
 
-type IPropsNumber  = {
+type IPropsNumber = {
   decimals: number;
+
 } & IProps
 
-type IPropsPhone  = {
+type IPropsPhone = {
   mask: string;
 } & IProps
 
@@ -39,6 +40,7 @@ function NumberFormatCustom(props: NumberFormatCustomProps) {
     <NumberFormat
       {...other}
       getInputRef={inputRef}
+      type='text'
       onValueChange={(values) => {
         onChange({
           target: {
@@ -55,7 +57,7 @@ function NumberFormatCustom(props: NumberFormatCustomProps) {
       prefix=""
       allowNegative={false}
       allowLeadingZeros={false}
-      allowEmptyFormatting={false}
+      allowEmptyFormatting={true}
     />
   );
 }
@@ -67,6 +69,7 @@ function PhoneFormatCustom(props: NumberFormatCustomProps) {
     <NumberFormat
       {...other}
       getInputRef={inputRef}
+      type='tel'
       onValueChange={(values) => {
         onChange({
           target: {

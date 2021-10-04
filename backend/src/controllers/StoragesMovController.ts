@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { getRepository, Between, getConnection } from 'typeorm';
+import { getRepository, getConnection } from 'typeorm';
 
 import { MovStorages } from '../entity/MovStorages'
 import { decryptToken } from '../services/jwtAuth'
@@ -22,17 +22,18 @@ export default {
         const token = req.get('Authorization')
         const DLid = req.params.DL
         const Filial = req.params.FILIAL
-        const PD = req.params.PD
-        const UD = req.params.UD
+        const Category = req.params.Category
+        const Refdt = req.params.Refdt
 
         const verified = decryptToken(token!)
 
         const products = verified && await getRepository(MovStorages).find({
             select: ['DLCod', 'Filial', 'PROD', 'PRODUTO', 'Refdt', 'Qtd'],
             where: {
-                Refdt: Between(new Date(PD), new Date(UD)),
+                Refdt: Refdt,
                 DLCod: DLid,
-                Filial: Filial
+                Filial: Filial,
+                Tipo: Category === 'INSUMOS' ? 'I' : null
             }
         })
 

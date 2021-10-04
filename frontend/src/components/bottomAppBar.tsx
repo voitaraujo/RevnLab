@@ -12,6 +12,74 @@ import Fab from "@material-ui/core/Fab";
 import Typography from "@material-ui/core/Typography";
 import Tooltip from "@material-ui/core/Tooltip";
 
+export const BottomAppBar = () => {
+  const classes = useStyles();
+  const history = useHistory();
+
+  const returnToStorages = () => {
+    window.sessionStorage.setItem("ScreenDesc", "Depósitos");
+    history.push("/inventario");
+  };
+
+  const logOut = () => {
+    window.sessionStorage.clear();
+    history.push("/");
+  };
+
+  return (
+    <React.Fragment>
+      <CssBaseline />
+      <AppBar position="fixed" color="primary" className={classes.appBar}>
+        <Toolbar>
+          <Tooltip
+            title={
+              <label style={{ fontSize: "14px", lineHeight: "20px" }}>
+                Sair
+              </label>
+            }
+            placement="top"
+            arrow
+          >
+            <IconButton
+              edge="start"
+              color="inherit"
+              aria-label="open drawer"
+              onClick={() => logOut()}
+            >
+              <ExitToApp />
+            </IconButton>
+          </Tooltip>
+          <Tooltip
+            title={
+              <label style={{ fontSize: "14px", lineHeight: "20px" }}>
+                Depósitos
+              </label>
+            }
+            placement="top"
+            arrow
+          >
+            <Fab
+              color="secondary"
+              aria-label="add"
+              className={classes.fabButton}
+              onClick={() => returnToStorages()}
+            >
+              <Apartment />
+            </Fab>
+          </Tooltip>
+          <div className={classes.grow} />
+
+          <div className={classes.descSize}>
+            <Typography gutterBottom variant="inherit">
+              {window.sessionStorage.getItem("ScreenDesc")}
+            </Typography>
+          </div>
+        </Toolbar>
+      </AppBar>
+    </React.Fragment>
+  );
+}
+
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     text: {
@@ -41,60 +109,11 @@ const useStyles = makeStyles((theme: Theme) =>
       right: 0,
       margin: "0 auto",
     },
+    descSize: {
+      maxWidth: '40%',
+      whiteSpace: 'nowrap',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+    }
   })
 );
-
-export default function BottomAppBar() {
-  const classes = useStyles();
-  const history = useHistory();
-
-  const returnToStorages = () => {
-    window.sessionStorage.setItem("ScreenDesc", "Depósitos");
-    history.push("/inventario");
-  };
-
-  const logOut = () => {
-    window.sessionStorage.clear();
-    history.push("/");
-  };
-
-  return (
-    <React.Fragment>
-      <CssBaseline />
-      <AppBar position="fixed" color="primary" className={classes.appBar}>
-        <Toolbar>
-          <IconButton
-            edge="start"
-            color="inherit"
-            aria-label="open drawer"
-            onClick={() => logOut()}
-          >
-            <ExitToApp />
-          </IconButton>
-          <Tooltip
-            title={
-              <label style={{ fontSize: "14px", lineHeight: "20px" }}>
-                Depósitos
-              </label>
-            }
-            placement="top"
-            arrow
-          >
-            <Fab
-              color="secondary"
-              aria-label="add"
-              className={classes.fabButton}
-              onClick={() => returnToStorages()}
-            >
-              <Apartment />
-            </Fab>
-          </Tooltip>
-          <div className={classes.grow} />
-          <Typography gutterBottom variant="inherit">
-            {window.sessionStorage.getItem("ScreenDesc")}
-          </Typography>
-        </Toolbar>
-      </AppBar>
-    </React.Fragment>
-  );
-}
