@@ -4,9 +4,6 @@ import { api } from "../../services/api";
 
 import { ReceiptOutlined } from "@material-ui/icons";
 import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemText from "@material-ui/core/ListItemText";
-import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import Divider from "@material-ui/core/Divider";
 import MenuItem from "@material-ui/core/MenuItem";
 import Typography from "@material-ui/core/Typography";
@@ -14,8 +11,8 @@ import Typography from "@material-ui/core/Typography";
 import { FullScreenDialog } from "../../components/dialogs";
 import { Toast } from "../../components/toasty";
 import { SelectControlled } from "../../components/select";
-import { InputNumber } from "../../components/inputFormat";
 import { Loading } from "../../components/loading";
+import { ListItemMemo } from './ListItem'
 
 interface IInventario {
   Refdt: string;
@@ -60,6 +57,8 @@ export const Inventory = ({ Info, Refs }: IProps): JSX.Element => {
   const [tipo, setTipo] = useState<string>("INSUMOS");
   const [selectedRef, setSelectedRef] = useState('');
 
+  let produtosAux = [...produtos]
+
   useEffect(() => {
     if (selectedRef !== '' && tipo !== '' && Info.Filial !== '' && Info.DLCod !== '') {
       loadInventoryDetails(Info.DLCod, Info.Filial, tipo, selectedRef)
@@ -92,18 +91,24 @@ export const Inventory = ({ Info, Refs }: IProps): JSX.Element => {
     setProdutos([]);
     setFetching(false);
     setSelectedRef('')
+    setTipo('INSUMOS')
   };
 
-  const handleValueChange = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-    index: number
-  ): void => {
-    const aux = [...produtos];
+  // const handleValueChange = (
+  //   event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  //   index: number
+  // ): void => {
 
-    aux[index].Qtd = event.target.value;
+  //   produtosAux[index].Qtd = event.target.value;
+  // };
 
-    setProdutos(aux);
-  };
+  const ApllyChangesToState = (produto: IInventario, index: number) => {
+    const aux = [...produtos]
+
+    aux[index] = produto
+
+    setProdutos([...aux])
+  }
 
   const handleSubmit = async (): Promise<boolean> => {
     let shouldCloseModal = true;
@@ -196,25 +201,7 @@ export const Inventory = ({ Info, Refs }: IProps): JSX.Element => {
           ) : (
             produtos.map((item, i) => (
               <div key={item.PROD}>
-                <ListItem>
-                  <ListItemText
-                    primary={item.PRODUTO}
-                    secondary={`Código: ${item.PROD}`}
-                  />
-                  <ListItemSecondaryAction
-                    style={{ width: "10%", minWidth: "100px" }}
-                  >
-                    <InputNumber
-                      decimals={0}
-                      onChange={(event) => handleValueChange(event, i)}
-                      disabled={false}
-                      label="Qtd"
-                      value={item.Qtd}
-                      type="outlined"
-                      focus={false}
-                    />
-                  </ListItemSecondaryAction>
-                </ListItem>
+                <ListItemMemo produto={item} index={i} changeHandler={ApllyChangesToState}/>
                 <Divider />
               </div>
             ))

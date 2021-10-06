@@ -17,26 +17,26 @@ export const Toast = (
         pauseOnHover: false,
         draggable: true,
       });
-    case "error":
-      return toast.error(message, {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: false,
-        draggable: true,
-      });
-    case "default":
-      return toast.info(message, {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: false,
-        draggable: true,
-      });
-  }
-};
+      case "error":
+        return toast.error(message, {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+        });
+        case "default":
+          return toast.info(message, {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: false,
+            draggable: true,
+          });
+        }
+      };
 
 export const ToastyContainer = (): JSX.Element => {
   return (
@@ -46,7 +46,7 @@ export const ToastyContainer = (): JSX.Element => {
       hideProgressBar
       newestOnTop={false}
       closeOnClick
-      rtl
+      rtl={false}
       pauseOnFocusLoss={true}
       draggable
       pauseOnHover={false}

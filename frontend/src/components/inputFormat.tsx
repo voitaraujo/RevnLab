@@ -14,6 +14,9 @@ type IProps = {
   onChange: (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => void;
+  onBlur?: (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => void;
   label: string;
   disabled: boolean;
   value: string | number | null;
@@ -107,6 +110,13 @@ export const InputNumber = (props: IPropsNumber): JSX.Element => {
     props.onChange(event);
   };
 
+  const handleBlur = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+
+    props.onBlur && props.onBlur(event);
+  };
+
   return (
     <div className={classes.root}>
       <TextField
@@ -114,6 +124,7 @@ export const InputNumber = (props: IPropsNumber): JSX.Element => {
         label={props.label}
         disabled={props.disabled}
         onChange={handleChange}
+        onBlur={handleBlur}
         InputProps={{
           inputComponent: NumberFormatCustom as any,
         }}

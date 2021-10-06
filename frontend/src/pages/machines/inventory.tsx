@@ -1,24 +1,18 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from "react";
 import moment from "moment";
 import { api } from "../../services/api";
 
 import { ReceiptOutlined } from "@material-ui/icons";
 import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
-import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import MenuItem from "@material-ui/core/MenuItem";
 import Divider from "@material-ui/core/Divider";
 import Typography from "@material-ui/core/Typography";
 
-import {
-  FullScreenDialog
-} from "../../components/dialogs";
-import { InputNumber } from "../../components/inputFormat";
+import { FullScreenDialog } from "../../components/dialogs";
 import { SelectControlled } from "../../components/select";
 import { Toast } from "../../components/toasty";
 import { Loading } from "../../components/loading";
+import { ListItemMemo } from './ListItem'
 
 interface IDetalhes {
   N1_ZZFILIA: string;
@@ -40,30 +34,35 @@ interface IInventario {
   CHAPA: string;
 }
 interface Refs {
-  DLCod: string,
-  Refdt: string,
-  InvMovSeq: number,
-  InvMovStaus: number
+  DLCod: string;
+  Refdt: string;
+  InvMovSeq: number;
+  InvMovStaus: number;
 }
 interface IProps {
-  Info: IDetalhes
-  DLCod: string
-  Refs: Refs[]
+  Info: IDetalhes;
+  DLCod: string;
+  Refs: Refs[];
 }
 
 export const Inventory = ({ Info, DLCod, Refs }: IProps): JSX.Element => {
   const [produtos, setProdutos] = useState<IInventario[]>([]);
   const [fetching, setFetching] = useState<boolean>(false);
   const [tipo, setTipo] = useState<string>("SNACKS");
-  const [selectedRef, setSelectedRef] = useState('');
+  const [selectedRef, setSelectedRef] = useState("");
 
   useEffect(() => {
-    if (Info.CHAPA !== '' && DLCod !== '' && tipo !== '' && selectedRef !== '') {
-      loadInventoryDetails(Info.CHAPA, DLCod, tipo, selectedRef)
+    if (
+      Info.CHAPA !== "" &&
+      DLCod !== "" &&
+      tipo !== "" &&
+      selectedRef !== ""
+    ) {
+      loadInventoryDetails(Info.CHAPA, DLCod, tipo, selectedRef);
     } else {
-      setProdutos([])
+      setProdutos([]);
     }
-  }, [Info.CHAPA, DLCod, tipo, selectedRef])
+  }, [Info.CHAPA, DLCod, tipo, selectedRef]);
 
   const loadInventoryDetails = async (
     CHAPA: string,
@@ -74,7 +73,9 @@ export const Inventory = ({ Info, DLCod, Refs }: IProps): JSX.Element => {
     setFetching(true);
     try {
       const response = await api.get<IInventario[]>(
-        `/inventory/machines/${DL}/${CHAPA}/${Category}/${moment(Refdt).format('YYYY-MM-DD')}`
+        `/inventory/machines/${DL}/${CHAPA}/${Category}/${moment(Refdt).format(
+          "YYYY-MM-DD"
+        )}`
       );
 
       setProdutos(response.data);
@@ -83,23 +84,21 @@ export const Inventory = ({ Info, DLCod, Refs }: IProps): JSX.Element => {
       Toast("Não foi possivel carregar o inventário da máquina", "error");
       setFetching(false);
     }
-  }
+  };
 
   const handleClose = () => {
-    setProdutos([])
+    setProdutos([]);
     setFetching(false);
-    setSelectedRef('')
-  }
+    setSelectedRef("");
+    setTipo('SNACKS')
+  };
 
-  const handleValueChange = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-    index: number
-  ): void => {
-    const aux = [...produtos];
+  const ApplyChangesToState = (item: IInventario, index: number) => {
+    const aux = [...produtos]
 
-    aux[index].Qtd = event.target.value;
-
-    setProdutos(aux);
+    aux[index] = item
+    
+    setProdutos([...aux]);
   };
 
   const handleSubmit = async (): Promise<boolean> => {
@@ -153,23 +152,25 @@ export const Inventory = ({ Info, DLCod, Refs }: IProps): JSX.Element => {
     >
       <SelectControlled
         value={selectedRef}
-        onChange={e => {
-          setSelectedRef(String(e.target.value))}
-        }
+        onChange={(e) => {
+          setSelectedRef(String(e.target.value));
+        }}
         disabled={fetching}
         label="Referência"
         variant="outlined"
         enableVoidSelection={true}
       >
-        {Refs.map(ref => (
-          <MenuItem value={ref.Refdt} key={ref.Refdt}>{moment(ref.Refdt).format('L')}</MenuItem>
+        {Refs.map((ref) => (
+          <MenuItem value={ref.Refdt} key={ref.Refdt}>
+            {moment(ref.Refdt).format("L")}
+          </MenuItem>
         ))}
       </SelectControlled>
       <SelectControlled
         value={tipo}
         onChange={(e) => {
-          setTipo(String(e.target.value))}
-        }
+          setTipo(String(e.target.value));
+        }}
         disabled={true}
         label="Categoria"
         variant="outlined"
@@ -179,48 +180,30 @@ export const Inventory = ({ Info, DLCod, Refs }: IProps): JSX.Element => {
       </SelectControlled>
       {fetching ? (
         <Loading />
-      ) : (<List>
-        {produtos.length === 0 ? (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Typography gutterBottom variant="h6">
-              Nenhum produto à exibir.
-            </Typography>
-          </div>
-        ) : (
-          produtos.map((item, i) => (
-            <div key={item.SEL}>
-              <ListItem>
-                <ListItemIcon>{item.SEL}</ListItemIcon>
-                <ListItemText
-                  primary={item.PRODUTO}
-                  secondary={`Código: ${item.PROD}`}
-                />
-                <ListItemSecondaryAction
-                  style={{ width: "10%", minWidth: "100px" }}
-                >
-                  <InputNumber
-                    decimals={0}
-                    onChange={(event) => handleValueChange(event, i)}
-                    disabled={false}
-                    label="Qtd"
-                    value={item.Qtd}
-                    type="outlined"
-                    focus={false}
-                  />
-                </ListItemSecondaryAction>
-              </ListItem>
-              <Divider />
+      ) : (
+        <List>
+          {produtos.length === 0 ? (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Typography gutterBottom variant="h6">
+                Nenhum produto à exibir.
+              </Typography>
             </div>
-          ))
-        )}
-      </List>
+          ) : (
+            produtos.map((item, i) => (
+              <div key={item.SEL}>
+                <ListItemMemo produto={item} index={i} changeHandler={ApplyChangesToState}/>
+                <Divider />
+              </div>
+            ))
+          )}
+        </List>
       )}
     </FullScreenDialog>
-  )
-}
+  );
+};
