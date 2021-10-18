@@ -16,12 +16,7 @@ import { InputSimple } from "../../components/input";
 import { RED_PRIMARY } from "../../assets/colors";
 import { Toast } from "../../components/toasty";
 import { InputPhone } from "../../components/inputFormat";
-
-interface IAuthResponse {
-  user_token?: string;
-  user?: string;
-  message?: string;
-}
+import { IAuthResponse } from './loginTypes'
 
 function Login(): JSX.Element {
   const [userCode, setUserCode] = useState("");

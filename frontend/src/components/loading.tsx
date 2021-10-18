@@ -2,7 +2,7 @@ import React from "react";
 import ReactLoading from "react-loading";
 import { RED_PRIMARY } from "../assets/colors";
 
-export const Loading = () => {
+export const Loading = ():JSX.Element => {
   return (
     <div
       style={{

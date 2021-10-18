@@ -13,40 +13,10 @@ import { SelectControlled } from "../../components/select";
 import { Toast } from "../../components/toasty";
 import { Loading } from "../../components/loading";
 import { ListItemMemo } from './ListItem'
+import { IInventoryProps, IProdutoInventário } from './machinesTypes'
 
-interface IDetalhes {
-  N1_ZZFILIA: string;
-  CHAPA: string;
-  SERIE: string;
-  CLICOD: string;
-  CLILJ: string;
-  DL: string;
-  Modelo: string;
-}
-interface IInventario {
-  DLCod: string;
-  PROD: string;
-  SEL: string;
-  PRODUTO: string;
-  Qtd: number | string | null;
-  Refdt: string;
-  Filial: string;
-  CHAPA: string;
-}
-interface Refs {
-  DLCod: string;
-  Refdt: string;
-  InvMovSeq: number;
-  InvMovStaus: number;
-}
-interface IProps {
-  Info: IDetalhes;
-  DLCod: string;
-  Refs: Refs[];
-}
-
-export const Inventory = ({ Info, DLCod, Refs }: IProps): JSX.Element => {
-  const [produtos, setProdutos] = useState<IInventario[]>([]);
+export const Inventory = ({ Info, DLCod, Refs }: IInventoryProps): JSX.Element => {
+  const [produtos, setProdutos] = useState<IProdutoInventário[]>([]);
   const [fetching, setFetching] = useState<boolean>(false);
   const [tipo, setTipo] = useState<string>("SNACKS");
   const [selectedRef, setSelectedRef] = useState("");
@@ -72,7 +42,7 @@ export const Inventory = ({ Info, DLCod, Refs }: IProps): JSX.Element => {
   ) => {
     setFetching(true);
     try {
-      const response = await api.get<IInventario[]>(
+      const response = await api.get<IProdutoInventário[]>(
         `/inventory/machines/${DL}/${CHAPA}/${Category}/${moment(Refdt).format(
           "YYYY-MM-DD"
         )}`
@@ -93,7 +63,7 @@ export const Inventory = ({ Info, DLCod, Refs }: IProps): JSX.Element => {
     setTipo('SNACKS')
   };
 
-  const ApplyChangesToState = (item: IInventario, index: number) => {
+  const ApplyChangesToState = (item: IProdutoInventário, index: number) => {
     const aux = [...produtos]
 
     aux[index] = item

@@ -3,7 +3,8 @@ import {
     MACHINES_LOAD_ALL,
 } from "../actions/MachineActionsTypes";
 
-import { IMachinesState, IMachines } from './MachineReducerInterfaces'
+import { IMachinesState } from './MachineReducerTypes'
+import { IMachines } from '../../pages/machines/machinesTypes'
 
 const initialState: IMachinesState = {
     DialogState: false,
@@ -21,7 +22,7 @@ const initialState: IMachinesState = {
     Refs: []
 };
 
-export const MachinesReducer = (state = initialState, action: any) => {
+export const MachinesReducer = (state = initialState, action: { type: string, value: any }): IMachinesState => {
     switch (action.type) {
         case MACHINES_DIALOG_STATE:
             return {

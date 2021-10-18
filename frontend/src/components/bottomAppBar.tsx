@@ -12,7 +12,7 @@ import Fab from "@material-ui/core/Fab";
 import Typography from "@material-ui/core/Typography";
 import Tooltip from "@material-ui/core/Tooltip";
 
-export const BottomAppBar = () => {
+export const BottomAppBar = ():JSX.Element => {
   const classes = useStyles();
   const history = useHistory();
 

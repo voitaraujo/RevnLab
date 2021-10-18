@@ -11,39 +11,12 @@ import { Toast } from "../../components/toasty";
 import { Inventory } from './inventory'
 import { Loading } from "../../components/loading";
 
+import { IDetailsProps,IDepositoDetalhes, IRefs } from './storageTypes'
 
-interface IDetalhes {
-    Filial: string;
-    DLCod: string;
-    GestorCod: string;
-    DLQtEq: number;
-    DLNome: string;
-    DLEndereco: string;
-    DLBairro: string;
-    DLCEP: string;
-    DLUF: string;
-    DLMunicipio: string;
-    DLMunicipioCod: string;
-    DLStatus: string;
-    DLLoja: string;
-}
-
-interface Refs {
-    DLCod: string,
-    Refdt: string,
-    InvMovSeq: number,
-    InvMovStaus: number
-}
-
-interface IProps {
-    DL: string
-    Filial: string
-}
-
-const Details = ({ DL, Filial }: IProps): JSX.Element => {
-    const [DLInfo, setDLInfo] = useState<IDetalhes>(DetailsInitialState);
+const Details = ({ DL, Filial }: IDetailsProps): JSX.Element => {
+    const [DLInfo, setDLInfo] = useState<IDepositoDetalhes>(DetailsInitialState);
     const [fetching, setFetching] = useState<boolean>(true);
-    const [refs, setRefs] = useState<Refs[]>([])
+    const [refs, setRefs] = useState<IRefs[]>([])
     const [open, setOpen] = useState(false);
 
     const history = useHistory();
@@ -51,8 +24,8 @@ const Details = ({ DL, Filial }: IProps): JSX.Element => {
     const handleOpen = async (DLCOD: string, FILIAL: string) => {
         setOpen(true)
         try {
-            const responseDepInfo = await api.get<IDetalhes[]>(`/storages/${FILIAL}/${DLCOD}`);
-            const responseDepRefs = await api.get<{ Refs: Refs[] }>(`/references/storages/${DLCOD}`)
+            const responseDepInfo = await api.get<IDepositoDetalhes[]>(`/storages/${FILIAL}/${DLCOD}`);
+            const responseDepRefs = await api.get<{ Refs: IRefs[] }>(`/references/storages/${DLCOD}`)
 
             setDLInfo(responseDepInfo.data[0]);
             setRefs(responseDepRefs.data.Refs);

@@ -6,25 +6,9 @@ import ListItemText from "@material-ui/core/ListItemText";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 
 import { InputNumber } from "../../components/inputFormat";
+import { IListItemProps } from './machinesTypes'
 
-interface IProduto {
-  DLCod: string;
-  PROD: string;
-  SEL: string;
-  PRODUTO: string;
-  Qtd: number | string | null;
-  Refdt: string;
-  Filial: string;
-  CHAPA: string;
-}
-
-interface IProps {
-  produto: IProduto;
-  index: number;
-  changeHandler: (item: IProduto, index: number) => void;
-}
-
-const ListItemCustom = ({ produto, index, changeHandler }: IProps) => {
+const ListItemCustom = ({ produto, index, changeHandler }: IListItemProps) => {
     const [item, setItem] = useState(produto)
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

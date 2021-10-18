@@ -39,7 +39,7 @@ interface IPropsControlled extends IProps {
   open: boolean
 }
 
-export const DraggableDialog = (props: IPropsUncontrolled) => {
+export const DraggableDialog = (props: IPropsUncontrolled):JSX.Element => {
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
@@ -92,7 +92,7 @@ export const DraggableDialog = (props: IPropsUncontrolled) => {
   );
 }
 
-export const FullScreenDialog = (props: IPropsUncontrolled) => {
+export const FullScreenDialog = (props: IPropsUncontrolled):JSX.Element => {
   const classes = useStyles();
   const [open, setOpen] = React.useState(false)
 
@@ -107,7 +107,7 @@ export const FullScreenDialog = (props: IPropsUncontrolled) => {
   };
 
   const handleConfirm = async () => {
-    let testResult = props.onConfirm && await props.onConfirm()
+    const testResult = props.onConfirm && await props.onConfirm()
     if(typeof testResult != 'undefined'){
       setOpen(!testResult);
     }else{
@@ -145,7 +145,7 @@ export const FullScreenDialog = (props: IPropsUncontrolled) => {
   );
 }
 
-export const DraggableDialogControlled = (props: IPropsControlled) => {
+export const DraggableDialogControlled = (props: IPropsControlled):JSX.Element => {
   const { open } = props
 
   const handleClose = () => {

@@ -8,16 +8,7 @@ import { DataGrid, GridColDef } from "@material-ui/data-grid";
 import Details from './details'
 import { Loading } from "../../components/loading";
 
-interface IDepositos {
-  id?: string;
-  DLCod: string;
-  DLNome: string;
-  Filial: string;
-}
-
-interface LoadDTO {
-  storages: IDepositos[];
-}
+import { IDepositos, LoadDTO } from './storageTypes'
 
 const Storages = (): JSX.Element => {
   const [depositos, setDepositos] = useState<IDepositos[]>([]);

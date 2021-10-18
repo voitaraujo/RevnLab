@@ -14,50 +14,13 @@ import { SelectControlled } from "../../components/select";
 import { Loading } from "../../components/loading";
 import { ListItemMemo } from './ListItem'
 
-interface IInventario {
-  Refdt: string;
-  Filial: string;
-  DLCod: string;
-  PROD: string;
-  PRODUTO: string;
-  Qtd: number | string | null;
-}
+import { IInventoryProps, IDepositoInventario } from './storageTypes'
 
-interface IDetalhes {
-  Filial: string;
-  DLCod: string;
-  GestorCod: string;
-  DLQtEq: number;
-  DLNome: string;
-  DLEndereco: string;
-  DLBairro: string;
-  DLCEP: string;
-  DLUF: string;
-  DLMunicipio: string;
-  DLMunicipioCod: string;
-  DLStatus: string;
-  DLLoja: string;
-}
-
-interface Refs {
-  DLCod: string,
-  Refdt: string,
-  InvMovSeq: number,
-  InvMovStaus: number
-}
-
-interface IProps {
-  Info: IDetalhes;
-  Refs: Refs[];
-}
-
-export const Inventory = ({ Info, Refs }: IProps): JSX.Element => {
-  const [produtos, setProdutos] = useState<IInventario[]>([]);
+export const Inventory = ({ Info, Refs }: IInventoryProps): JSX.Element => {
+  const [produtos, setProdutos] = useState<IDepositoInventario[]>([]);
   const [fetching, setFetching] = useState<boolean>(false);
   const [tipo, setTipo] = useState<string>("INSUMOS");
   const [selectedRef, setSelectedRef] = useState('');
-
-  let produtosAux = [...produtos]
 
   useEffect(() => {
     if (selectedRef !== '' && tipo !== '' && Info.Filial !== '' && Info.DLCod !== '') {
@@ -75,7 +38,7 @@ export const Inventory = ({ Info, Refs }: IProps): JSX.Element => {
   ) => {
     setFetching(true);
     try {
-      const response = await api.get<IInventario[]>(
+      const response = await api.get<IDepositoInventario[]>(
         `/inventory/storages/${DLCOD}/${FILIAL}/${Category}/${moment(Refdt).format('YYYY-MM-DD')}/`
       );
 
@@ -94,15 +57,7 @@ export const Inventory = ({ Info, Refs }: IProps): JSX.Element => {
     setTipo('INSUMOS')
   };
 
-  // const handleValueChange = (
-  //   event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  //   index: number
-  // ): void => {
-
-  //   produtosAux[index].Qtd = event.target.value;
-  // };
-
-  const ApllyChangesToState = (produto: IInventario, index: number) => {
+  const ApplyChangesToState = (produto: IDepositoInventario, index: number) => {
     const aux = [...produtos]
 
     aux[index] = produto
@@ -201,7 +156,7 @@ export const Inventory = ({ Info, Refs }: IProps): JSX.Element => {
           ) : (
             produtos.map((item, i) => (
               <div key={item.PROD}>
-                <ListItemMemo produto={item} index={i} changeHandler={ApllyChangesToState}/>
+                <ListItemMemo produto={item} index={i} changeHandler={ApplyChangesToState}/>
                 <Divider />
               </div>
             ))

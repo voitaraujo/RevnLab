@@ -11,31 +11,21 @@ import {
 } from "../../components/dialogs";
 import { Inventory } from './inventory'
 import { Loading } from "../../components/loading";
-import { IStore, IMachinesState, IDetalhes, IRefs } from '../../global/reducer/MachineReducerInterfaces'
+
+import { IMachinesState } from '../../global/reducer/MachineReducerTypes'
 import { SetDialogState, SetMachineDetails, SetMachineRefs } from '../../global/actions/MachineActions'
-interface IProps {
-    DLCod: string,
-    Chapa: string
-}
+import { IStore } from '../../global/store/storeTypes'
+import { IDetailsPropsWithRedux, IMachineDetalhes, IRefs } from './machinesTypes'
 
-interface IPropsFromRedux {
-    SetDialogState: (value: boolean) => void
-    State: IMachinesState
-}
-
-type IPropsWithRedux = IProps & IPropsFromRedux
-
-const DetailsWithState = ({ DLCod, Chapa, SetDialogState, State }: IPropsWithRedux): JSX.Element => {
-    const [machineInfo, setMachineInfo] = useState<IDetalhes>(DetailsInitialState);
+const DetailsWithState = ({ DLCod, Chapa, SetDialogState, State }: IDetailsPropsWithRedux): JSX.Element => {
+    const [machineInfo, setMachineInfo] = useState<IMachineDetalhes>(DetailsInitialState);
     const [refs, setRefs] = useState<IRefs[]>([])
     const [fetching, setFetching] = useState<boolean>(true);
-
-
 
     useEffect(() => {
         async function handleOpen() {
             try {
-                const responseDepInfo = await api.get<IDetalhes[]>(`/machines/details/${DLCod}/${Chapa}`);
+                const responseDepInfo = await api.get<IMachineDetalhes[]>(`/machines/details/${DLCod}/${Chapa}`);
                 const responseDepRefs = await api.get<{ Refs: IRefs[] }>(`/references/storages/${DLCod}`)
 
                 setMachineInfo(responseDepInfo.data[0]);
@@ -108,9 +98,9 @@ export const Details = connect<{
         type: string;
         value: boolean;
     };
-    SetMachineDetails: (value: IDetalhes) => {
+    SetMachineDetails: (value: IMachineDetalhes) => {
         type: string;
-        value: IDetalhes;
+        value: IMachineDetalhes;
     };
     SetMachineRefs: (value: IRefs[]) => {
         type: string;

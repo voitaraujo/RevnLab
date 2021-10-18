@@ -13,32 +13,16 @@ import { Details } from './details'
 import { Loading } from "../../components/loading";
 import { ClearButton } from '../../components/buttons'
 
-import { IMachines, IStore, IMachinesState } from '../../global/reducer/MachineReducerInterfaces'
+import { IMachinesState } from '../../global/reducer/MachineReducerTypes'
 import { SetMachinesList, SetDialogState } from '../../global/actions/MachineActions'
+import { IStore } from '../../global/store/storeTypes'
+import { IIndexParams, IIndexPropsWithRedux, IIndexLoadDTO, IMachines } from './machinesTypes'
 
-interface IParams {
-  DL: string;
-}
-
-interface LoadDTO {
-  machines: IMachines[];
-}
-
-interface IPropsFromRedux {
-  SetDialogState: (value: boolean) => void,
-  SetMachinesList: (value: IMachines[]) => void,
-  State: IMachinesState
-}
-
-interface IProps { }
-
-type IPropsWithRedux = IProps & IPropsFromRedux
-
-const MachinesWithRedux = ({ State, SetMachinesList, SetDialogState }: IPropsWithRedux): JSX.Element => {
+const MachinesWithRedux = ({ State, SetMachinesList, SetDialogState }: IIndexPropsWithRedux): JSX.Element => {
   const [fetching, setFetching] = useState<boolean>(true);
   const [chapaTarget, setChapaTarget] = useState<string>('');
 
-  const Params = useParams<IParams>();
+  const Params = useParams<IIndexParams>();
   const columns: GridColDef[] = [
     {
       field: "id",
@@ -88,7 +72,7 @@ const MachinesWithRedux = ({ State, SetMachinesList, SetDialogState }: IPropsWit
   useEffect(() => {
     async function load() {
       try {
-        const response = await api.get<LoadDTO>(`/machines/${Params.DL}`);
+        const response = await api.get<IIndexLoadDTO>(`/machines/${Params.DL}`);
 
         SetMachinesList(MachinesStateToTable(response.data.machines));
         setFetching(false)
@@ -144,7 +128,7 @@ export const Machines = connect<{
       value: IMachines[];
     };
   },
-  {},
+  unknown,
   IStore>(mapStateToProps, mapDispatchToProps)(MachinesWithRedux);
 
 const MachinesStateToTable = (Machines: IMachines[]): IMachines[] => {
