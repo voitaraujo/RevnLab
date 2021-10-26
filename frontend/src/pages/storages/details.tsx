@@ -1,9 +1,13 @@
 import React, { useState } from 'react'
 import { useHistory } from "react-router-dom";
 import { api } from "../../services/api";
+import moment from 'moment'
 
-import { AccountTreeOutlined, InfoOutlined } from "@material-ui/icons";
+import { AccountTreeOutlined, InfoOutlined, ExpandMore } from "@material-ui/icons";
 import Typography from "@material-ui/core/Typography";
+import Accordion from '@material-ui/core/Accordion';
+import AccordionDetails from '@material-ui/core/AccordionDetails';
+import AccordionSummary from '@material-ui/core/AccordionSummary';
 
 import { DraggableDialogControlled } from "../../components/dialogs";
 import { ClearButton } from "../../components/buttons";
@@ -11,7 +15,7 @@ import { Toast } from "../../components/toasty";
 import { Inventory } from './inventory'
 import { Loading } from "../../components/loading";
 
-import { IDetailsProps,IDepositoDetalhes, IRefs } from './storageTypes'
+import { IDetailsProps, IDepositoDetalhes, IRefs } from './storageTypes'
 
 const Details = ({ DL, Filial }: IDetailsProps): JSX.Element => {
     const [DLInfo, setDLInfo] = useState<IDepositoDetalhes>(DetailsInitialState);
@@ -24,10 +28,10 @@ const Details = ({ DL, Filial }: IDetailsProps): JSX.Element => {
     const handleOpen = async (DLCOD: string, FILIAL: string) => {
         setOpen(true)
         try {
-            const responseDepInfo = await api.get<IDepositoDetalhes[]>(`/storages/${FILIAL}/${DLCOD}`);
+            const responseDepInfo = await api.get<IDepositoDetalhes>(`/storages/${FILIAL}/${DLCOD}`);
             const responseDepRefs = await api.get<{ Refs: IRefs[] }>(`/references/storages/${DLCOD}`)
 
-            setDLInfo(responseDepInfo.data[0]);
+            setDLInfo(responseDepInfo.data);
             setRefs(responseDepRefs.data.Refs);
             setFetching(false)
         } catch (err) {
@@ -90,6 +94,27 @@ const Details = ({ DL, Filial }: IDetailsProps): JSX.Element => {
                     <Typography gutterBottom variant="subtitle1">
                         Equipamentos no Depósito: <strong>{DLInfo.DLQtEq}</strong>
                     </Typography>
+                    <Accordion>
+                        <AccordionSummary
+                            expandIcon={<ExpandMore />}
+                        >
+                            <Typography>Pendencias</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                            <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+                                {DLInfo.pastMonthsInv.map(pastMonth =>
+                                    <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                                        <Typography variant='subtitle1'>
+                                            {capitalizeMonthFirstLetter(moment(pastMonth.Refdt).format('MMMM'))}
+                                        </Typography>
+                                        <Typography variant='subtitle1'>
+                                            <strong>{pastMonth.FaltamProdutos} Produtos</strong>
+                                        </Typography>
+                                    </div>
+                                )}
+                            </div>
+                        </AccordionDetails>
+                    </Accordion>
                 </>
             )
                 }
@@ -115,4 +140,9 @@ const DetailsInitialState = {
     DLMunicipioCod: "",
     DLStatus: "",
     DLLoja: "",
+    pastMonthsInv: []
 };
+
+const capitalizeMonthFirstLetter = (month: string): string => {
+    return month.charAt(0).toUpperCase() + month.slice(1)
+}

@@ -13,6 +13,7 @@ export interface IDepositoDetalhes {
     DLMunicipioCod: string;
     DLStatus: string;
     DLLoja: string;
+    pastMonthsInv: IPastMonthsData[]
 }
 
 //formato das referencias
@@ -54,4 +55,10 @@ export interface IDepositoInventario {
 export interface IInventoryProps {
     Info: IDepositoDetalhes;
     Refs: IRefs[];
+}
+
+interface IPastMonthsData {
+    DLCod: string,
+    Refdt: string,
+    FaltamProdutos: number
 }

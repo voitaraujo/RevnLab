@@ -1,7 +1,8 @@
 import { Request, Response } from 'express';
-import { getRepository } from 'typeorm';
+import { getRepository, createQueryBuilder } from 'typeorm';
 
 import { Storages } from '../entity/Storages'
+import { MovStorages } from '../entity/MovStorages'
 import { decryptToken } from '../services/jwtAuth'
 
 
@@ -46,11 +47,31 @@ export default {
             }
         })
 
-        storage ? res.status(200).send(storage) : res.status(400).send({
+        const ProdsFaltam = await getLastMovProdsInfo(Filial, DLid)
+
+        const completeStorage = storage ? { ...storage[0], pastMonthsInv: ProdsFaltam } : null
+
+        completeStorage ? res.status(200).send(completeStorage) : res.status(400).send({
             message: 'Error while querying database'
         })
 
-
         return res
     }
+}
+
+const getLastMovProdsInfo = async (filial: string, DLId: string) => {
+    const RawQuery = getRepository(MovStorages).createQueryBuilder();
+
+    RawQuery.select("DLCod")
+        .addSelect("Refdt")
+        .addSelect("COUNT(PROD)", "FaltamProdutos")
+        .where(`Qtd IS NULL AND Filial = '${filial}' AND DLCod = '${DLId}'`)
+        .groupBy("Refdt")
+        .addGroupBy("DLCod")
+        .addGroupBy("GestorCod")
+        .orderBy('Refdt', 'DESC');
+
+    const UninformedProdsQtds = await RawQuery.getRawMany<{ DLCod: string, Refdt: string, FaltamProdutos: number }>()
+
+    return UninformedProdsQtds
 }
