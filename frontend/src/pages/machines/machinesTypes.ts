@@ -32,6 +32,7 @@ export interface IMachineDetalhes {
     CLILJ: string;
     DL: string;
     Modelo: string;
+    pastMonthsEqInv: IPastMonthsEqData[]
 }
 
 //formato de cada produto que compõe o inventário
@@ -91,3 +92,9 @@ interface IIndexPropsFromRedux {
 
 // export type IIndexPropsWithRedux = IIndexProps & IIndexPropsFromRedux
 export type IIndexPropsWithRedux = IIndexPropsFromRedux
+
+interface IPastMonthsEqData {
+    Refdt: string,
+    CHAPA: string,
+    Faltam: number
+}

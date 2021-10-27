@@ -65,5 +65,28 @@ export default {
         return res.status(200).send({
             message: 'ok'
         })
+    },
+
+    async UpdateOne(req: Request, res: Response) {
+        const token = req.get('Authorization')
+        const { Line }: { Line: IProdutos } = req.body
+
+        const verified = decryptToken(token!)
+
+        verified && await getConnection()
+            .createQueryBuilder()
+            .update(MovStorages)
+            .set({
+                Qtd: Number(Line.Qtd)
+            })
+            .where(
+                "Refdt = :Refdt AND DLCod = :DLCod AND Filial = :Filial AND PROD = :PROD",
+                { Refdt: Line.Refdt, DLCod: Line.DLCod, Filial: Line.Filial, PROD: Line.PROD }
+            )
+            .execute()
+
+        return res.status(200).send({
+            message: 'ok'
+        })
     }
 }

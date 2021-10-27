@@ -13,7 +13,11 @@ export interface IDepositoDetalhes {
     DLMunicipioCod: string;
     DLStatus: string;
     DLLoja: string;
-    pastMonthsInv: IPastMonthsData[]
+    pastMonthsDLInv: IPastMonthsDLData[],
+    pastMonthsDLEqInv: { 
+        Ref: string, 
+        Eqs: IPastMonthsDLEqData[] 
+    }[]
 }
 
 //formato das referencias
@@ -57,8 +61,20 @@ export interface IInventoryProps {
     Refs: IRefs[];
 }
 
-interface IPastMonthsData {
+interface IPastMonthsDLData {
     DLCod: string,
     Refdt: string,
     FaltamProdutos: number
 }
+
+interface IPastMonthsDLEqData {
+    Refdt: string,
+    CHAPA: string,
+    Faltam: number
+}
+
+export interface IListItemProps {
+    produto: IDepositoInventario;
+    index: number;
+    changeHandler: (item: IDepositoInventario, index: number) => void;
+  }

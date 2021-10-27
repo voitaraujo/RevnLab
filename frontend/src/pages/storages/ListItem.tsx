@@ -1,34 +1,39 @@
 import React, { memo, useState } from "react";
+import { api } from '../../services/api'
 
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 
 import { InputNumber } from "../../components/inputFormat";
+import { IListItemProps } from './storageTypes'
+import { Toast } from '../../components/toasty'
 
-interface IProps {
-  produto: IProduto;
-  index: number;
-  changeHandler: (item: IProduto, index: number) => void;
-}
-
-interface IProduto {
-  Refdt: string;
-  Filial: string;
-  DLCod: string;
-  PROD: string;
-  PRODUTO: string;
-  Qtd: number | string | null;
-}
-
-const ListItemCustom = ({ produto, index, changeHandler }: IProps) => {
-  const [item, setItem] = useState<IProduto>(produto);
+const ListItemCustom = ({ produto }: IListItemProps) => {
+  const [item, setItem] = useState({ ...produto });
+  const [oldQtd, setOldQtd] = useState<string | number | null>(produto.Qtd);
 
   const handleChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    setItem({ ...item, Qtd: event.target.value });
+    setItem({
+      ...item,
+      Qtd: event.target.value === '' || event.target.value === null ? 0 : event.target.value
+    });
   };
+
+  const handleBlur = async () => {
+    try {
+      await api.put('/inventory/storages/product', {
+        Line: item
+      })
+      setOldQtd(item.Qtd)
+      Toast('Salvo', 'success')
+    } catch (err) {
+      setItem({ ...item, Qtd: oldQtd })
+      Toast('Erro', 'error')
+    }
+  }
 
   return (
     <ListItem>
@@ -36,8 +41,8 @@ const ListItemCustom = ({ produto, index, changeHandler }: IProps) => {
       <ListItemSecondaryAction style={{ width: "10%", minWidth: "100px" }}>
         <InputNumber
           decimals={0}
-          onChange={(event) => handleChange(event)}
-          onBlur={() => changeHandler(item, index)}
+          onChange={handleChange}
+          onBlur={handleBlur}
           disabled={false}
           label="Qtd"
           value={item.Qtd}

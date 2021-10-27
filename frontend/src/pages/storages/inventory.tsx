@@ -12,6 +12,8 @@ import { FullScreenDialog } from "../../components/dialogs";
 import { Toast } from "../../components/toasty";
 import { SelectControlled } from "../../components/select";
 import { Loading } from "../../components/loading";
+import { capitalizeMonthFirstLetter } from '../../misc/commomFunctions'
+
 import { ListItemMemo } from './ListItem'
 
 import { IInventoryProps, IDepositoInventario } from './storageTypes'
@@ -123,7 +125,7 @@ export const Inventory = ({ Info, Refs }: IInventoryProps): JSX.Element => {
         enableVoidSelection={true}
       >
         {Refs.map(ref => (
-          <MenuItem value={ref.Refdt} key={ref.Refdt}>{moment(ref.Refdt).format('L')}</MenuItem>
+          <MenuItem value={ref.Refdt} key={ref.Refdt}>{capitalizeMonthFirstLetter(moment(ref.Refdt).format('MMMM'))}</MenuItem>
         ))}
       </SelectControlled>
       <SelectControlled

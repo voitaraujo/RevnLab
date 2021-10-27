@@ -3,14 +3,20 @@ import { bindActionCreators, Dispatch } from 'redux'
 import { connect } from 'react-redux'
 import { api } from "../../services/api";
 import { Toast } from "../../components/toasty";
+import moment from 'moment'
 
+import { ExpandMore } from "@material-ui/icons";
 import Typography from "@material-ui/core/Typography";
+import Accordion from '@material-ui/core/Accordion';
+import AccordionDetails from '@material-ui/core/AccordionDetails';
+import AccordionSummary from '@material-ui/core/AccordionSummary';
 
 import {
     DraggableDialogControlled
 } from "../../components/dialogs";
 import { Inventory } from './inventory'
 import { Loading } from "../../components/loading";
+import { capitalizeMonthFirstLetter } from "../../misc/commomFunctions";
 
 import { IMachinesState } from '../../global/reducer/MachineReducerTypes'
 import { SetDialogState, SetMachineDetails, SetMachineRefs } from '../../global/actions/MachineActions'
@@ -25,10 +31,10 @@ const DetailsWithState = ({ DLCod, Chapa, SetDialogState, State }: IDetailsProps
     useEffect(() => {
         async function handleOpen() {
             try {
-                const responseDepInfo = await api.get<IMachineDetalhes[]>(`/machines/details/${DLCod}/${Chapa}`);
+                const responseDepInfo = await api.get<IMachineDetalhes>(`/machines/details/${DLCod}/${Chapa}`);
                 const responseDepRefs = await api.get<{ Refs: IRefs[] }>(`/references/storages/${DLCod}`)
 
-                setMachineInfo(responseDepInfo.data[0]);
+                setMachineInfo(responseDepInfo.data);
                 setRefs(responseDepRefs.data.Refs);
                 setFetching(false)
             } catch (err) {
@@ -70,6 +76,29 @@ const DetailsWithState = ({ DLCod, Chapa, SetDialogState, State }: IDetailsProps
                     <Typography gutterBottom variant="subtitle1">
                         Filial: <strong>{machineInfo.N1_ZZFILIA}</strong>
                     </Typography>
+                    {machineInfo.pastMonthsEqInv.length > 0 ? (
+                        <Accordion>
+                            <AccordionSummary
+                                expandIcon={<ExpandMore />}
+                            >
+                                <Typography>Pendencias EQ</Typography>
+                            </AccordionSummary>
+                            <AccordionDetails>
+                                <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+                                    {machineInfo.pastMonthsEqInv.map(pastMonth =>
+                                        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                                            <Typography variant='subtitle1'>
+                                                {capitalizeMonthFirstLetter(moment(pastMonth.Refdt).format('MMMM'))}
+                                            </Typography>
+                                            <Typography variant='subtitle1'>
+                                                <strong>{pastMonth.Faltam} Produtos</strong>
+                                            </Typography>
+                                        </div>
+                                    )}
+                                </div>
+                            </AccordionDetails>
+                        </Accordion>
+                    ) : null}
                 </>
             )}
 
@@ -119,4 +148,5 @@ const DetailsInitialState = {
     CLILJ: "",
     DL: "",
     Modelo: "",
+    pastMonthsEqInv: []
 };

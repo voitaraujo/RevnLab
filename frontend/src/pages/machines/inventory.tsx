@@ -14,6 +14,7 @@ import { Toast } from "../../components/toasty";
 import { Loading } from "../../components/loading";
 import { ListItemMemo } from './ListItem'
 import { IInventoryProps, IProdutoInventário } from './machinesTypes'
+import { capitalizeMonthFirstLetter } from "../../misc/commomFunctions";
 
 export const Inventory = ({ Info, DLCod, Refs }: IInventoryProps): JSX.Element => {
   const [produtos, setProdutos] = useState<IProdutoInventário[]>([]);
@@ -132,7 +133,7 @@ export const Inventory = ({ Info, DLCod, Refs }: IInventoryProps): JSX.Element =
       >
         {Refs.map((ref) => (
           <MenuItem value={ref.Refdt} key={ref.Refdt}>
-            {moment(ref.Refdt).format("L")}
+            {capitalizeMonthFirstLetter(moment(ref.Refdt).format("MMMM"))}
           </MenuItem>
         ))}
       </SelectControlled>

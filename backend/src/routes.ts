@@ -25,10 +25,12 @@ routes.get('/machines/details/:DL/:CHAPA', hasToken, MachinesController.See);
 //Movimentação dos depósitos
 routes.get('/inventory/storages/:DL/:FILIAL/:Category/:Refdt', hasToken, StoragesMovController.See);
 routes.put('/inventory/storages/', hasToken, StoragesMovController.Update);
+routes.put('/inventory/storages/product', hasToken, StoragesMovController.UpdateOne);
 
 //Movimentação das máquinas
 routes.get('/inventory/machines/:DL/:Chapa/:Category/:Refdt', hasToken, MachinesMovController.See);
 routes.put('/inventory/machines/', hasToken, MachinesMovController.Update);
+routes.put('/inventory/machines/product', hasToken, MachinesMovController.UpdateOne);
 
 //Referencias/Controle
 routes.get('/references/storages/:DL', hasToken, InvMovController.See);

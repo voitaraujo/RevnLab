@@ -18,6 +18,7 @@ const initialState: IMachinesState = {
         Modelo: '',
         N1_ZZFILIA: '',
         SERIE: '',
+        pastMonthsEqInv: []
     },
     Refs: []
 };

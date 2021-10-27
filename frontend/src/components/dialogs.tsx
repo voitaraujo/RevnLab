@@ -33,13 +33,14 @@ interface IPropsUncontrolled extends IProps {
   buttonType?: 'contained' | 'outlined' | 'text'
   buttonColor?: 'primary' | 'secondary'
   disabled?: boolean
+  enableSubmitButton?: boolean
 }
 
 interface IPropsControlled extends IProps {
   open: boolean
 }
 
-export const DraggableDialog = (props: IPropsUncontrolled):JSX.Element => {
+export const DraggableDialog = (props: IPropsUncontrolled): JSX.Element => {
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
@@ -92,7 +93,7 @@ export const DraggableDialog = (props: IPropsUncontrolled):JSX.Element => {
   );
 }
 
-export const FullScreenDialog = (props: IPropsUncontrolled):JSX.Element => {
+export const FullScreenDialog = (props: IPropsUncontrolled): JSX.Element => {
   const classes = useStyles();
   const [open, setOpen] = React.useState(false)
 
@@ -108,9 +109,9 @@ export const FullScreenDialog = (props: IPropsUncontrolled):JSX.Element => {
 
   const handleConfirm = async () => {
     const testResult = props.onConfirm && await props.onConfirm()
-    if(typeof testResult != 'undefined'){
+    if (typeof testResult != 'undefined') {
       setOpen(!testResult);
-    }else{
+    } else {
       setOpen(false)
     }
   };
@@ -121,7 +122,7 @@ export const FullScreenDialog = (props: IPropsUncontrolled):JSX.Element => {
         {props.buttonLabel}
       </Button>
       <Dialog fullScreen open={open} onClose={handleClose} scroll='paper' TransitionComponent={SlideTransition}>
-        
+
         <AppBar className={classes.appBar}>
           <Toolbar>
 
@@ -133,9 +134,14 @@ export const FullScreenDialog = (props: IPropsUncontrolled):JSX.Element => {
               {props.title}
             </Typography>
 
-            <Button autoFocus color="inherit" onClick={handleConfirm}>
-              Gravar
-            </Button>
+            {props.enableSubmitButton ?
+              <Button autoFocus color="inherit" onClick={handleConfirm}>
+                Gravar
+              </Button>
+              :
+              null
+            }
+
 
           </Toolbar>
         </AppBar>
@@ -145,7 +151,7 @@ export const FullScreenDialog = (props: IPropsUncontrolled):JSX.Element => {
   );
 }
 
-export const DraggableDialogControlled = (props: IPropsControlled):JSX.Element => {
+export const DraggableDialogControlled = (props: IPropsControlled): JSX.Element => {
   const { open } = props
 
   const handleClose = () => {
@@ -153,31 +159,31 @@ export const DraggableDialogControlled = (props: IPropsControlled):JSX.Element =
   };
 
   return (
-      <Dialog
-        open={open}
-        onClose={handleClose}
-        PaperComponent={PaperComponent}
-        TransitionComponent={FadeTransition}
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      PaperComponent={PaperComponent}
+      TransitionComponent={FadeTransition}
+    >
+      <DialogTitle
+        style={{ cursor: 'move' }}
+        id="draggable-dialog-title"
       >
-        <DialogTitle
-          style={{ cursor: 'move' }}
-          id="draggable-dialog-title"
+        {props.title}
+      </DialogTitle>
+      <DialogContent>
+        {props.children}
+      </DialogContent>
+      <DialogActions>
+        {props.extraActions}
+        <Button
+          onClick={handleClose}
+          color="secondary"
         >
-          {props.title}
-        </DialogTitle>
-        <DialogContent>
-          {props.children}
-        </DialogContent>
-        <DialogActions>
-          {props.extraActions}
-          <Button
-            onClick={handleClose}
-            color="secondary"
-          >
-            Fechar
-          </Button>
-        </DialogActions>
-      </Dialog>
+          Fechar
+        </Button>
+      </DialogActions>
+    </Dialog>
   )
 }
 

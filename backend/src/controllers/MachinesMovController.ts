@@ -50,6 +50,7 @@ export default {
             message: 'Error while querying database'
         })
     },
+
     async Update(req: Request, res: Response) {
         const token = req.get('Authorization')
         const { inventario }: ReqDTO = req.body
@@ -64,9 +65,32 @@ export default {
                     Qtd: Number(item.Qtd)
                 })
                 .where("Refdt = :Refdt AND Filial = :Filial AND DLCod = :DL AND CHAPA = :CHAPA AND SEL = :SEL AND PROD = :CodProd",
-                 { Refdt: item.Refdt, Filial: item.Filial, DL: item.DLCod, CHAPA: item.CHAPA, SEL: item.SEL, CodProd: item.PROD })
+                    { Refdt: item.Refdt, Filial: item.Filial, DL: item.DLCod, CHAPA: item.CHAPA, SEL: item.SEL, CodProd: item.PROD })
                 .execute()
         )
+
+        return res.status(200).send({
+            message: 'ok'
+        })
+    },
+
+    async UpdateOne(req: Request, res: Response) {
+        const token = req.get('Authorization')
+        const { Line }: { Line: IProdutos } = req.body
+
+        const verified = decryptToken(token!)
+
+        verified && await getConnection()
+            .createQueryBuilder()
+            .update(MovMachines)
+            .set({
+                Qtd: Number(Line.Qtd)
+            })
+            .where(
+                "Refdt = :Refdt AND Filial = :Filial AND DLCod = :DL AND CHAPA = :CHAPA AND SEL = :SEL AND PROD = :CodProd",
+                { Refdt: Line.Refdt, Filial: Line.Filial, DL: Line.DLCod, CHAPA: Line.CHAPA, SEL: Line.SEL, CodProd: Line.PROD }
+            )
+            .execute()
 
         return res.status(200).send({
             message: 'ok'

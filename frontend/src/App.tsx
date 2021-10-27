@@ -13,7 +13,7 @@ import { ToastyContainer } from "./components/toasty";
 
 function App(): JSX.Element {
   moment.locale("pt-br")
-
+  
   return (
     <ThemeProvider theme={theme}>
       <ToastyContainer />

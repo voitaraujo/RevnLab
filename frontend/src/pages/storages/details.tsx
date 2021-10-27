@@ -14,6 +14,7 @@ import { ClearButton } from "../../components/buttons";
 import { Toast } from "../../components/toasty";
 import { Inventory } from './inventory'
 import { Loading } from "../../components/loading";
+import { capitalizeMonthFirstLetter } from '../../misc/commomFunctions'
 
 import { IDetailsProps, IDepositoDetalhes, IRefs } from './storageTypes'
 
@@ -22,6 +23,7 @@ const Details = ({ DL, Filial }: IDetailsProps): JSX.Element => {
     const [fetching, setFetching] = useState<boolean>(true);
     const [refs, setRefs] = useState<IRefs[]>([])
     const [open, setOpen] = useState(false);
+    const [expanded, setExpanded] = React.useState<string | false>(false);
 
     const history = useHistory();
 
@@ -43,12 +45,18 @@ const Details = ({ DL, Filial }: IDetailsProps): JSX.Element => {
         setOpen(false);
         setDLInfo(DetailsInitialState);
         setFetching(true)
+        setExpanded(false)
+        setRefs([])
     };
 
     const handleMoveToMachines = (DLCOD: string, DLNAME: string) => {
         history.push(`/maquinaDL/${DLCOD}`)
         window.sessionStorage.setItem('ScreenDesc', DLNAME)
     }
+
+    const handleChange = (panel: string) => (event: React.ChangeEvent<{}>, isExpanded: boolean) => {
+        setExpanded(isExpanded ? panel : false);
+    };
 
     return (
         <>
@@ -94,27 +102,59 @@ const Details = ({ DL, Filial }: IDetailsProps): JSX.Element => {
                     <Typography gutterBottom variant="subtitle1">
                         Equipamentos no Depósito: <strong>{DLInfo.DLQtEq}</strong>
                     </Typography>
-                    <Accordion>
+                    {DLInfo.pastMonthsDLInv.length > 0 ? (
+                        <Accordion expanded={expanded === 'panel1'} onChange={handleChange('panel1')}>
+                            <AccordionSummary
+                                expandIcon={<ExpandMore />}
+                            >
+                                <Typography>Pendencias DL</Typography>
+                            </AccordionSummary>
+                            <AccordionDetails>
+                                <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+                                    {DLInfo.pastMonthsDLInv.map(pastMonth =>
+                                        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                                            <Typography variant='subtitle1'>
+                                                {capitalizeMonthFirstLetter(moment(pastMonth.Refdt).format('MMMM'))}
+                                            </Typography>
+                                            <Typography variant='subtitle1'>
+                                                <strong>{pastMonth.FaltamProdutos} Produtos</strong>
+                                            </Typography>
+                                        </div>
+                                    )}
+                                </div>
+                            </AccordionDetails>
+                        </Accordion>
+                    ) : null}
+
+                    {DLInfo.pastMonthsDLEqInv.length > 0 ? (<Accordion expanded={expanded === 'panel2'} onChange={handleChange('panel2')}>
                         <AccordionSummary
                             expandIcon={<ExpandMore />}
                         >
-                            <Typography>Pendencias</Typography>
+                            <Typography>Pendencias EQ</Typography>
                         </AccordionSummary>
                         <AccordionDetails>
                             <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-                                {DLInfo.pastMonthsInv.map(pastMonth =>
-                                    <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                                        <Typography variant='subtitle1'>
-                                            {capitalizeMonthFirstLetter(moment(pastMonth.Refdt).format('MMMM'))}
+                                {DLInfo.pastMonthsDLEqInv.map(pastMonth =>
+                                    <>
+                                        <Typography variant='subtitle1' gutterBottom={true}>
+                                            <strong>{capitalizeMonthFirstLetter(pastMonth.Ref)}</strong>
                                         </Typography>
-                                        <Typography variant='subtitle1'>
-                                            <strong>{pastMonth.FaltamProdutos} Produtos</strong>
-                                        </Typography>
-                                    </div>
+                                        {pastMonth.Eqs.map(EQ => (
+                                            <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                                                <Typography variant='subtitle2'>
+                                                    {EQ.CHAPA}
+                                                </Typography>
+                                                <Typography variant='subtitle2'>
+                                                    <strong>{EQ.Faltam} Produtos</strong>
+                                                </Typography>
+                                            </div>
+                                        ))}
+
+                                    </>
                                 )}
                             </div>
                         </AccordionDetails>
-                    </Accordion>
+                    </Accordion>) : null}
                 </>
             )
                 }
@@ -140,9 +180,6 @@ const DetailsInitialState = {
     DLMunicipioCod: "",
     DLStatus: "",
     DLLoja: "",
-    pastMonthsInv: []
+    pastMonthsDLInv: [],
+    pastMonthsDLEqInv: []
 };
-
-const capitalizeMonthFirstLetter = (month: string): string => {
-    return month.charAt(0).toUpperCase() + month.slice(1)
-}
