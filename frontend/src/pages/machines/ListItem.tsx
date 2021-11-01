@@ -17,25 +17,46 @@ const ListItemCustom = ({ produto }: IListItemProps) => {
   const handleChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    setItem({
+    const newItem = {
       ...item,
       Qtd: event.target.value === '' || event.target.value === null ? 0 : event.target.value
-    })
-  }
+    }
 
-  const handleBlur = async () => {
-    try {
-      await api.put('/inventory/machines/product', {
-        Line: item
+    setOldQtd(item.Qtd)
+    setItem(newItem)
+
+    try{
+      api.put('/inventory/machines/product', {
+        Line: newItem
       })
-
-      setOldQtd(item.Qtd)
-      Toast('Salvo', 'success')
-    } catch (err) {
-      setItem({ ...item, Qtd: oldQtd })
-      Toast('Erro', 'error')
+    }catch(err){
+      const newItem = {
+        ...item,
+        Qtd: oldQtd
+      }
+      setItem(newItem)
+      Toast('Falha ao salvar última alteracao', 'error')
     }
   }
+
+  // const handleBlur = async () => {
+//     let toastId = null 
+
+// toastId = Toast('Aguarde...', 'wait')
+  //   try {
+  //     await api.put('/inventory/machines/product', {
+  //       Line: item
+  //     })
+
+  //     setOldQtd(item.Qtd)
+  //     Toast('Salvo', 'success')
+  // Toast('Salvo!', 'update', toastId, 'success')
+  //   } catch (err) {
+  //     setItem({ ...item, Qtd: oldQtd })
+  //     Toast('Erro', 'error')
+  // Toast('Erro', 'update', toastId, 'error')
+  //   }
+  // }
 
   return (
     <ListItem>
@@ -45,7 +66,7 @@ const ListItemCustom = ({ produto }: IListItemProps) => {
         <InputNumber
           decimals={0}
           onChange={handleChange}
-          onBlur={handleBlur}
+          // onBlur={handleBlur}
           disabled={false}
           label="Qtd"
           value={item.Qtd}

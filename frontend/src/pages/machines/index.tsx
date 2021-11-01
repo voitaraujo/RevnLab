@@ -68,7 +68,7 @@ const MachinesWithRedux = ({ State, SetMachinesList, SetDialogState }: IIndexPro
     SetDialogState(true)
   }
 
-  //carrega a lista de máquinas do DL e referencias
+  //carrega a lista de máquinas do DL
   useEffect(() => {
     async function load() {
       try {
@@ -77,7 +77,7 @@ const MachinesWithRedux = ({ State, SetMachinesList, SetDialogState }: IIndexPro
         SetMachinesList(MachinesStateToTable(response.data.machines));
         setFetching(false)
       } catch (err) {
-        Toast("Falha ao buscar as máquinas do depósito", "error");
+        Toast("Falha ao buscar as máquinas vinculadas ao depósito", "error");
         setFetching(false)
       }
     }

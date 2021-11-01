@@ -5,36 +5,31 @@ import "react-toastify/dist/ReactToastify.css";
 
 export const Toast = (
   message: string,
-  type: "success" | "error" | "default"
-): React.ReactText => {
+  type: "success" | "warn" | "error" | 'info' | 'wait' | "update",
+  id?: void | React.ReactText,
+  sub?: "success" | "error"
+): React.ReactText | void => {
   switch (type) {
-    case "success":
-      return toast.success(message, {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: false,
-        draggable: true,
-      });
-      case "error":
-        return toast.error(message, {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: false,
-          draggable: true,
-        });
-        case "default":
-          return toast.info(message, {
-            position: "top-right",
-            autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: false,
-            draggable: true,
-          });
+    case 'success':
+      return toast.success(message)
+
+    case 'warn':
+      return toast.warn(message)
+
+    case 'error':
+      return toast.error(message)
+
+    case 'info':
+      return toast.info(message)
+
+    case 'wait':
+      return toast.loading(message)
+
+    case 'update':
+      return toast.update(id!, { render: message, type: sub, isLoading: false, autoClose: 3000 })
+
+    default:
+      return toast.info(message)
         }
       };
 
@@ -43,13 +38,13 @@ export const ToastyContainer = (): JSX.Element => {
     <ToastContainer
       position="top-right"
       autoClose={3000}
-      hideProgressBar
-      newestOnTop={false}
+      hideProgressBar={true}
+      newestOnTop={true}
       closeOnClick
       rtl={false}
       pauseOnFocusLoss={true}
-      draggable
-      pauseOnHover={false}
+      draggable={true}
+      pauseOnHover={true}
     />
   );
 };

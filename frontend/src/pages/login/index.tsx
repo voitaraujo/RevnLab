@@ -48,14 +48,17 @@ function Login(): JSX.Element {
 
   const handleLogin = async () => {
     setWait(true);
-    Toast("Autenticando", "default");
+    
+    let toastId = null 
+    toastId = Toast('Aguarde...', 'wait')
+
     try {
       const response = await api.post<IAuthResponse>("/authentication", {
         user: userCode,
         password: userPassword,
       });
 
-      Toast("Autenticado", "success");
+      Toast('Conectado!', 'update', toastId, 'success')
       response.data.user_token &&
         window.sessionStorage.setItem("token", response.data.user_token);
       response.data.user &&
@@ -66,7 +69,7 @@ function Login(): JSX.Element {
       // aqui não da pra usar o history.push porque o sessionStorage não é sincrono(vou chegar em inventário mais rapido do que vou gravar o token no navegador, ai da erro na rota)
       window.location.assign("/inventario");
     } catch (err) {
-      Toast("Falha na autenticação", "error");
+      Toast('Número ou Senha incorretos!', 'update', toastId, 'error')
       setWait(false);
     }
   };

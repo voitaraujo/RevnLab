@@ -33,7 +33,7 @@ export default {
                 Refdt: Refdt,
                 DLCod: DLid,
                 Filial: Filial,
-                Tipo: Category === 'INSUMOS' ? 'I' : null
+                Tipo: Category === 'INSUMOS' ? 'I' : 'N'
             }
         })
 

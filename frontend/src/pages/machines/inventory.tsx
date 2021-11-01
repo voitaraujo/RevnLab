@@ -76,7 +76,7 @@ export const Inventory = ({ Info, DLCod, Refs }: IInventoryProps): JSX.Element =
     let shouldCloseModal = true;
 
     if (produtos.length === 0) {
-      Toast("Inventário vazio", "default");
+      Toast("Inventário vazio", "warn");
       shouldCloseModal = false;
     }
 
@@ -88,12 +88,16 @@ export const Inventory = ({ Info, DLCod, Refs }: IInventoryProps): JSX.Element =
       ) {
         Toast(
           "Qtd. de um ou mais itens do inventário não informados",
-          "default"
+          "warn"
         );
         shouldCloseModal = false;
         break;
       }
     }
+
+    let toastId = null 
+
+    toastId = Toast('Aguarde...', 'wait')
 
     if (shouldCloseModal) {
       try {
@@ -101,9 +105,9 @@ export const Inventory = ({ Info, DLCod, Refs }: IInventoryProps): JSX.Element =
           inventario: produtos,
         });
 
-        Toast("Inventário salvo com sucesso", "success");
+        Toast('Inventário salvo com sucesso!', 'update', toastId, 'success')
       } catch (err) {
-        Toast("Falha ao salvar inventário", "error");
+        Toast('Falha ao salvar inventário', 'update', toastId, 'error')
         shouldCloseModal = false;
       }
     }

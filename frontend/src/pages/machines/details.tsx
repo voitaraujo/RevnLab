@@ -38,7 +38,7 @@ const DetailsWithState = ({ DLCod, Chapa, SetDialogState, State }: IDetailsProps
                 setRefs(responseDepRefs.data.Refs);
                 setFetching(false)
             } catch (err) {
-                Toast("Não foi possivel trazer as informações da máquina", "error");
+                Toast("Não foi possivel recuperar as informações da máquina", "error");
             }
         }
         if (State.DialogState) {

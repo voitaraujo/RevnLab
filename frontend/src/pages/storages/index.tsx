@@ -53,7 +53,7 @@ const Storages = (): JSX.Element => {
         setDepositos(response.data.storages);
         setFetching(false)
       } catch (err) {
-        Toast("Falha ao buscar as máquinas do depósito", "error");
+        Toast("Falha ao recuperar depósitos", "error");
         setFetching(false)
       }
     }
