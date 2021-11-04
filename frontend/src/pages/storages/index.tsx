@@ -38,9 +38,12 @@ const Storages = (): JSX.Element => {
       width: 90,
       align: "center",
       renderCell: (params) => (
-        <Details
-          DL={params.row.id} Filial={params.row.Filial}
-        />
+        <div style={{ display: 'flex', flex: 1, borderRight: '10px solid #000'}}>
+          <Details
+            DL={params.row.id}
+            Filial={params.row.Filial}
+          />
+        </div>
       ),
     },
   ];
