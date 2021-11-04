@@ -53,8 +53,8 @@ export default {
             }
         })
 
-        const ProdsFaltamDL = await getPastStorageMovInfo(Filial, DLid)
-        const ProdsFaltamEQ = await getPastStorageMachinesMovInfo(Filial, DLid)
+        const ProdsFaltamDL = await getPastStorageMovInfo(Filial, DLid, verified.user_code)
+        const ProdsFaltamEQ = await getPastStorageMachinesMovInfo(Filial, DLid, verified.user_code)
 
         const completeStorage = storage && storage.length > 0 ? {
             ...storage[0],
@@ -70,13 +70,13 @@ export default {
     }
 }
 
-const getPastStorageMovInfo = async (filial: string, DLId: string): Promise<IFaltaEmDL[]> => {
+const getPastStorageMovInfo = async (filial: string, DLId: string, GestorCod: string): Promise<IFaltaEmDL[]> => {
     const RawQuery_MovStorage = getRepository(MovStorages).createQueryBuilder();
 
     RawQuery_MovStorage.select("DLCod")
         .addSelect("Refdt")
         .addSelect("COUNT(PROD)", "FaltamProdutos")
-        .where(`Qtd IS NULL AND Filial = '${filial}' AND DLCod = '${DLId}'`)
+        .where(`Qtd IS NULL AND Filial = '${filial}' AND DLCod = '${DLId}' AND GestorCod = '${GestorCod}'`)
         .groupBy("Refdt")
         .addGroupBy("DLCod")
         .addGroupBy("GestorCod")
@@ -87,13 +87,13 @@ const getPastStorageMovInfo = async (filial: string, DLId: string): Promise<IFal
     return _retorno
 }
 
-const getPastStorageMachinesMovInfo = async (filial: string, DLId: string): Promise<{ Ref: string, Eqs: IFaltaEmEQ[] }[]> => {
+const getPastStorageMachinesMovInfo = async (filial: string, DLId: string, GestorCod: string): Promise<{ Ref: string, Eqs: IFaltaEmEQ[] }[]> => {
     const RawQuery_MovEq = getRepository(MovMachines).createQueryBuilder();
 
     RawQuery_MovEq.select("Refdt")
         .addSelect("CHAPA")
         .addSelect("COUNT(PROD)", "Faltam")
-        .where(`Qtd is null and Filial = '${filial}' and DLCod = '${DLId}'`)
+        .where(`Qtd is null and Filial = '${filial}' and DLCod = '${DLId}' AND GestorCod = '${GestorCod}'`)
         .groupBy("DLCod")
         .addGroupBy("CHAPA")
         .addGroupBy("Refdt")

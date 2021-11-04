@@ -31,6 +31,8 @@ export default {
         const token = req.get('Authorization')
         const Chapa = req.params.Chapa
         const DLid = req.params.DL
+        /* Atualmente o tipo de produtos está fixado em SNACKS no frontend,
+        tambem não preciso usar ele para nada, mas caso precise, está aqui */
         const Category = req.params.Category
         const Refdt = req.params.Refdt
 
@@ -39,10 +41,10 @@ export default {
         const products = verified && await getRepository(MovMachines).find({
             select: ['DLCod', 'SEL', 'PRODUTO', 'PROD', 'Qtd', 'Refdt', 'Filial', 'CHAPA'],
             where: {
-                CHAPA: Chapa,
-                DLCod: DLid,
+                Refdt: Refdt,
                 GestorCod: verified.user_code,
-                Refdt: Refdt
+                DLCod: DLid,
+                CHAPA: Chapa,
             }
         })
 

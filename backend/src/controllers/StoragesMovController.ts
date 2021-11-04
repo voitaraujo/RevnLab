@@ -17,6 +17,12 @@ interface ReqDTO {
     inventario: IProdutos[],
 }
 
+interface IToken {
+    user_code: string,
+    user_name: string,
+    role: string,
+}
+
 export default {
     async See(req: Request, res: Response) {
         const token = req.get('Authorization')
@@ -25,7 +31,7 @@ export default {
         const Category = req.params.Category
         const Refdt = req.params.Refdt
 
-        const verified = decryptToken(token!)
+        const verified = <IToken>decryptToken(token!)
 
         const products = verified && await getRepository(MovStorages).find({
             select: ['DLCod', 'Filial', 'PROD', 'PRODUTO', 'Refdt', 'Qtd'],
@@ -33,6 +39,7 @@ export default {
                 Refdt: Refdt,
                 DLCod: DLid,
                 Filial: Filial,
+                GestorCod: verified.user_code,
                 Tipo: Category === 'INSUMOS' ? 'I' : 'N'
             }
         })

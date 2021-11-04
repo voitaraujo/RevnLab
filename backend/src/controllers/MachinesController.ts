@@ -78,7 +78,7 @@ export default {
                 }
             })
 
-            const ProdsFaltamEQ = await getPastStorageMovInfo(Chapa, DLid)
+            const ProdsFaltamEQ = await getPastStorageMovInfo(Chapa, DLid, verified.user_code)
 
             const completeStorage = machines && machines.length > 0 ? {
                 ...machines[0],
@@ -94,13 +94,13 @@ export default {
     }
 }
 
-const getPastStorageMovInfo = async (CHAPA: string, DLId: string): Promise<IFaltaEmEq[]> => {
+const getPastStorageMovInfo = async (CHAPA: string, DLId: string, GestorCod: string): Promise<IFaltaEmEq[]> => {
     const RawQuery_MovStorage = getRepository(MovMachines).createQueryBuilder();
 
     RawQuery_MovStorage.select("Refdt")
         .addSelect("CHAPA")
         .addSelect("COUNT(PROD)", "Faltam")
-        .where(`Qtd IS NULL AND DLCod = '${DLId}' and CHAPA = '${CHAPA}'`)
+        .where(`Qtd IS NULL AND DLCod = '${DLId}' AND CHAPA = '${CHAPA}' AND GestorCod = '${GestorCod}'`)
         .groupBy("Refdt")
         .addGroupBy("CHAPA")
         .orderBy('Refdt', 'DESC');
