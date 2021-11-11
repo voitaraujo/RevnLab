@@ -41,7 +41,8 @@ export const hasToken = (req: Request, res: Response, next: Function) => {
             jwt.verify(token, process.env.SALT_KEY!)
             // jwt.decode(token)
 
-            //se chegar aqui o token provavelmente é válido, ai passamos pro próximo handler
+
+            //se chegar aqui o token *provavelmente* é válido, ai passamos pro próximo handler
             next()
         } catch (err: any) {
 

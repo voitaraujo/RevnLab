@@ -18,11 +18,11 @@ export default {
         const verified = <IToken>decryptToken(token!)
 
         const Refs = await getRepository(InvMov).find({
-            select: ['DLCod', 'Refdt', 'InvMovSeq', 'InvMovStaus'],
+            select: ['DLCod', 'Refdt', 'InvMovSeq', 'InvMovStatus'],
             where: {
                 GestorCod: verified.user_code,
                 DLCod: DLid,
-                InvMovStaus: 0,
+                InvMovStatus: 0,
             }
         })
 

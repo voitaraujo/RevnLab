@@ -40,6 +40,7 @@ export interface IDepositos {
     DLCod: string;
     DLNome: string;
     Filial: string;
+    Faltam: number
 }
 
 //DTO = data transfer object

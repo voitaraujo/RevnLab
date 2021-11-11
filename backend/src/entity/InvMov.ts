@@ -34,7 +34,7 @@ export class InvMov {
         type: 'varchar',
         length: 1,
     })
-    InvMovStaus!: string;
+    InvMovStatus!: string;
 
 
 }

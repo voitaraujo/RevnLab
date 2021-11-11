@@ -54,11 +54,13 @@ const MachinesWithRedux = ({ State, SetMachinesList, SetDialogState }: IIndexPro
       width: 90,
       align: "center",
       renderCell: (params) => (
-        <ClearButton
-          disabled={false}
-          label={<InfoOutlined />}
-          onClick={() => handleOpenMachineDetails(String(params.id))}
-        />
+        <div style={{ display: 'flex', flex: 1, borderRight: `10px solid ${params.row.Faltam > 0 ? '#ffee70' : '#a0e64c'}` }}>
+          <ClearButton
+            disabled={false}
+            label={<InfoOutlined />}
+            onClick={() => handleOpenMachineDetails(String(params.id))}
+          />
+        </div>
       ),
     },
   ];

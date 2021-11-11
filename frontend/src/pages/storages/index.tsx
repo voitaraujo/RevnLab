@@ -38,7 +38,7 @@ const Storages = (): JSX.Element => {
       width: 90,
       align: "center",
       renderCell: (params) => (
-        <div style={{ display: 'flex', flex: 1, borderRight: '10px solid #000'}}>
+        <div style={{ display: 'flex', flex: 1, borderRight: `10px solid ${params.row.Faltam > 0 ? '#ffee70' : '#a0e64c' }`}}>
           <Details
             DL={params.row.id}
             Filial={params.row.Filial}
@@ -89,6 +89,7 @@ const DepositoStateToTable = (Depositos: IDepositos[]): IDepositos[] => {
       DLCod: dep.DLCod,
       DLNome: dep.DLNome,
       Filial: dep.Filial,
+      Faltam: dep.Faltam,
     })
   );
 

@@ -23,12 +23,35 @@ export default {
         const token = req.get('Authorization')
 
         const verified = <IToken>decryptToken(token!)
+        const mesAnterior = moment().subtract(1, 'month').startOf('month').format("YYYY-MM-DD hh:mm:ss").replace('12:', '00:')
 
-        const storages = verified && await getRepository(Storages).find({
+        const storagesCab = await getRepository(Storages).find({
             select: ['DLCod', 'DLNome', 'Filial'],
             where: {
                 GestorCod: verified.user_code
+            },
+            order: {
+                DLCod: 'ASC'
             }
+        })
+
+        const faltamStorages = await getCurrentMonthStorageMovInfo(verified.user_code, mesAnterior)
+
+        let storages: { DLCod: string, DLNome: string, Filial: string, Faltam: number }[] = []
+
+        storagesCab.forEach(storage => {
+            let found = false
+            for (let i = 0; i < faltamStorages.length; i++) {
+                if (storage.DLCod === faltamStorages[i].DLCod) {
+                    storages.push(Object.assign({ ...storage }, { Faltam: faltamStorages[i].Faltam }))
+                    found = true
+                    break
+                }
+            }
+            if (!found) {
+                storages.push(Object.assign({ ...storage }, { Faltam: 0 }))
+            }
+            found = false
         })
 
         storages ? res.status(200).send({ storages }) : res.status(400).send({
@@ -124,6 +147,20 @@ const getPastStorageMachinesMovInfo = async (filial: string, DLId: string, Gesto
             }
         })
     })
+
+    return _retorno
+}
+
+const getCurrentMonthStorageMovInfo = async (GestorCod: string, Referencia: string): Promise<{ DLCod: string, Faltam: number }[]> => {
+    const RawQuery_MovStorage = getRepository(MovStorages).createQueryBuilder();
+
+    RawQuery_MovStorage.select("DLCod")
+        .addSelect("COUNT(PROD)", "Faltam")
+        .where(`Qtd IS NULL AND GestorCod = '${GestorCod}' AND Refdt = convert(smalldatetime, '${Referencia}', 101)`)
+        .groupBy("DLCod")
+        .orderBy('DLCod', 'DESC');
+
+    const _retorno = await RawQuery_MovStorage.getRawMany<{ DLCod: string, Faltam: number }>()
 
     return _retorno
 }
