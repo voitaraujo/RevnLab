@@ -1,12 +1,19 @@
 ﻿import jwt from 'jsonwebtoken'
 import chalk from 'chalk';
 import { Request, Response } from 'express'
+export interface IToken {
+    user_code: string,
+    user_name: string,
+    supervisor_code: string,
+    role: string,
+}
 
-export const genToken = (user: string, name: string, role: "lider" | "adm") => {
+export const genToken = (user: string, name: string, supervisor: string, role: "lider" | "adm") => {
     try {
         return jwt.sign({
-            user_code: user.trim(),
-            user_name: name.trim(),
+            user_code: String(user).trim(),
+            user_name: String(name).trim(),
+            supervisor_code: String(supervisor).trim(),
             role: role.trim()
         }, process.env.SALT_KEY!)
     } catch (err) {

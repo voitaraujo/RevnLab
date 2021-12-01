@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { getRepository, getConnection } from 'typeorm';
 
 import { MovStorages } from '../entity/MovStorages'
-import { decryptToken } from '../services/jwtAuth'
+import { decryptToken, IToken } from '../services/jwtAuth'
 
 interface IProdutos {
     Refdt: string;
@@ -15,12 +15,6 @@ interface IProdutos {
 
 interface ReqDTO {
     inventario: IProdutos[],
-}
-
-interface IToken {
-    user_code: string,
-    user_name: string,
-    role: string,
 }
 
 export default {
@@ -39,7 +33,7 @@ export default {
                 Refdt: Refdt,
                 DLCod: DLid,
                 Filial: Filial,
-                GestorCod: verified.user_code,
+                GestorCod: verified.supervisor_code,
                 Tipo: Category === 'INSUMOS' ? 'I' : 'N'
             }
         })
@@ -63,7 +57,7 @@ export default {
                 .createQueryBuilder()
                 .update(MovStorages)
                 .set({
-                    Qtd: Number(item.Qtd)
+                    Qtd: item.Qtd === null ? undefined : Number(item.Qtd)
                 })
                 .where("Refdt = :Refdt AND DLCod = :DLCod AND Filial = :Filial AND PROD = :PROD", { Refdt: item.Refdt, DLCod: item.DLCod, Filial: item.Filial, PROD: item.PROD })
                 .execute()

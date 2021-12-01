@@ -24,8 +24,15 @@ export const Inventory = ({ Info, Refs }: IInventoryProps): JSX.Element => {
   const [tipo, setTipo] = useState<string>("INSUMOS");
   const [selectedRef, setSelectedRef] = useState('');
 
+  let backupProdutos: IDepositoInventario[] = [...produtos]
+
   useEffect(() => {
-    if (selectedRef !== '' && tipo !== '' && Info.Filial !== '' && Info.DLCod !== '') {
+    if (
+      selectedRef !== '' &&
+      tipo !== '' &&
+      Info.Filial !== '' &&
+      Info.DLCod !== ''
+    ) {
       loadInventoryDetails(Info.DLCod, Info.Filial, tipo, selectedRef)
     } else {
       setProdutos([])
@@ -45,6 +52,7 @@ export const Inventory = ({ Info, Refs }: IInventoryProps): JSX.Element => {
       );
 
       setProdutos(response.data);
+      backupProdutos = [...response.data]
       setFetching(false);
     } catch (err) {
       Toast("Não foi possivel recuperar o inventário do depósito", "error");
@@ -59,12 +67,8 @@ export const Inventory = ({ Info, Refs }: IInventoryProps): JSX.Element => {
     setTipo('INSUMOS')
   };
 
-  const ApplyChangesToState = (produto: IDepositoInventario, index: number) => {
-    const aux = [...produtos]
-
-    aux[index] = produto
-
-    setProdutos([...aux])
+  const ApplyChangesToState = (item: IDepositoInventario, index: number) => {
+    backupProdutos[index] = item
   }
 
   const handleSubmit = async (): Promise<boolean> => {
@@ -75,29 +79,30 @@ export const Inventory = ({ Info, Refs }: IInventoryProps): JSX.Element => {
       shouldCloseModal = false;
     }
 
-    for (let i = 0; i < produtos.length; i++) {
-      if (
-        produtos[i].Qtd === "" ||
-        produtos[i].Qtd === null ||
-        typeof produtos[i].Qtd == "undefined"
-      ) {
-        Toast(
-          "Qtd. de um ou mais itens do inventário não informados",
-          "warn"
-        );
-        shouldCloseModal = false;
-        break;
-      }
-    }
+    // for (let i = 0; i < produtos.length; i++) {
+    //   if (
+    //     produtos[i].Qtd === "" ||
+    //     produtos[i].Qtd === null ||
+    //     typeof produtos[i].Qtd == "undefined"
+    //   ) {
+    //     Toast(
+    //       "Qtd. de um ou mais itens do inventário não informados",
+    //       "warn"
+    //     );
+    //     shouldCloseModal = false;
+    //     break;
+    //   }
+    // }
 
-    let toastId = null 
-
-toastId = Toast('Aguarde...', 'wait')
 
     if (shouldCloseModal) {
+      let toastId = null
+
+      toastId = Toast('Aguarde...', 'wait')
+
       try {
         await api.put(`/inventory/storages/`, {
-          inventario: produtos,
+          inventario: backupProdutos,
         });
 
         Toast('Inventário salvo com sucesso!', 'update', toastId, 'success')
@@ -119,6 +124,7 @@ toastId = Toast('Aguarde...', 'wait')
       buttonType="text"
       onConfirm={handleSubmit}
       onClose={handleClose}
+      enableSubmitButton
     >
       <SelectControlled
         value={selectedRef}
@@ -162,7 +168,11 @@ toastId = Toast('Aguarde...', 'wait')
           ) : (
             produtos.map((item, i) => (
               <div key={item.PROD}>
-                <ListItemMemo produto={item} index={i} changeHandler={ApplyChangesToState}/>
+                <ListItemMemo
+                  produto={item}
+                  index={i}
+                  changeHandler={ApplyChangesToState}
+                />
                 <Divider />
               </div>
             ))

@@ -3,13 +3,7 @@ import { getRepository, getConnection } from 'typeorm';
 import moment from 'moment';
 
 import { MovMachines } from '../entity/MovMachines'
-import { decryptToken } from '../services/jwtAuth'
-
-interface IToken {
-    user_code: string,
-    user_name: string,
-    role: string,
-}
+import { decryptToken, IToken } from '../services/jwtAuth'
 
 interface IProdutos {
     DLCod: string,
@@ -42,7 +36,7 @@ export default {
             select: ['DLCod', 'SEL', 'PRODUTO', 'PROD', 'Qtd', 'Refdt', 'Filial', 'CHAPA'],
             where: {
                 Refdt: Refdt,
-                GestorCod: verified.user_code,
+                GestorCod: verified.supervisor_code,
                 DLCod: DLid,
                 CHAPA: Chapa,
             }
@@ -64,7 +58,7 @@ export default {
                 .createQueryBuilder()
                 .update(MovMachines)
                 .set({
-                    Qtd: Number(item.Qtd)
+                    Qtd: item.Qtd === null ? undefined : Number(item.Qtd)
                 })
                 .where("Refdt = :Refdt AND Filial = :Filial AND DLCod = :DL AND CHAPA = :CHAPA AND SEL = :SEL AND PROD = :CodProd",
                     { Refdt: item.Refdt, Filial: item.Filial, DL: item.DLCod, CHAPA: item.CHAPA, SEL: item.SEL, CodProd: item.PROD })

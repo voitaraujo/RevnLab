@@ -111,6 +111,9 @@ export const FullScreenDialog = (props: IPropsUncontrolled): JSX.Element => {
     const testResult = props.onConfirm && await props.onConfirm()
     if (typeof testResult != 'undefined') {
       setOpen(!testResult);
+      if(testResult && props.onClose){
+        props.onClose()
+      }
     } else {
       setOpen(false)
     }

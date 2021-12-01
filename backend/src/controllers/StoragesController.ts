@@ -5,14 +5,7 @@ import { getRepository, createQueryBuilder } from 'typeorm';
 import { Storages } from '../entity/Storages'
 import { MovStorages } from '../entity/MovStorages'
 import { MovMachines } from '../entity/MovMachines'
-import { decryptToken } from '../services/jwtAuth'
-
-
-interface IToken {
-    user_code: string,
-    user_name: string,
-    role: string,
-}
+import { decryptToken, IToken } from '../services/jwtAuth'
 
 interface IFaltaEmDL { DLCod: string, Refdt: string, FaltamProdutos: number }
 
@@ -28,14 +21,15 @@ export default {
         const storagesCab = await getRepository(Storages).find({
             select: ['DLCod', 'DLNome', 'Filial'],
             where: {
-                GestorCod: verified.user_code
+                GestorCod: verified.supervisor_code,
+                DLStatus: 'S',
             },
             order: {
                 DLCod: 'ASC'
             }
         })
 
-        const faltamStorages = await getCurrentMonthStorageMovInfo(verified.user_code, mesAnterior)
+        const faltamStorages = await getCurrentMonthStorageMovInfo(verified.supervisor_code, mesAnterior)
 
         let storages: { DLCod: string, DLNome: string, Filial: string, Faltam: number }[] = []
 
@@ -70,14 +64,14 @@ export default {
 
         const storage = verified && await getRepository(Storages).find({
             where: {
-                GestorCod: verified.user_code,
+                GestorCod: verified.supervisor_code,
                 DLCod: DLid,
                 Filial: Filial
             }
         })
 
-        const ProdsFaltamDL = await getPastStorageMovInfo(Filial, DLid, verified.user_code)
-        const ProdsFaltamEQ = await getPastStorageMachinesMovInfo(Filial, DLid, verified.user_code)
+        const ProdsFaltamDL = await getPastStorageMovInfo(Filial, DLid, verified.supervisor_code)
+        const ProdsFaltamEQ = await getPastStorageMachinesMovInfo(Filial, DLid, verified.supervisor_code)
 
         const completeStorage = storage && storage.length > 0 ? {
             ...storage[0],

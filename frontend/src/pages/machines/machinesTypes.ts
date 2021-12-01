@@ -6,6 +6,7 @@ export interface IMachines {
     CHAPA: string;
     Modelo: string;
     SERIE: string;
+    Faltam: number;
 }
 
 //props que o details.tsx tem que receber por instancia

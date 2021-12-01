@@ -86,7 +86,7 @@ const DetailsWithState = ({ DLCod, Chapa, SetDialogState, State }: IDetailsProps
                             <AccordionDetails>
                                 <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
                                     {machineInfo.pastMonthsEqInv.map(pastMonth =>
-                                        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                                        <div key={pastMonth.Refdt} style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                                             <Typography variant='subtitle1'>
                                                 {capitalizeMonthFirstLetter(moment(pastMonth.Refdt).format('MMMM'))}
                                             </Typography>

@@ -54,7 +54,13 @@ const MachinesWithRedux = ({ State, SetMachinesList, SetDialogState }: IIndexPro
       width: 90,
       align: "center",
       renderCell: (params) => (
-        <div style={{ display: 'flex', flex: 1, borderRight: `10px solid ${params.row.Faltam > 0 ? '#ffee70' : '#a0e64c'}` }}>
+        <div
+          style={{
+            display: 'flex',
+            flex: 1,
+            borderRight: `10px solid ${params.row.Faltam > 0 ? '#ffee70' : '#a0e64c'}`
+          }}
+          >
           <ClearButton
             disabled={false}
             label={<InfoOutlined />}
@@ -142,6 +148,7 @@ const MachinesStateToTable = (Machines: IMachines[]): IMachines[] => {
       CHAPA: maq.CHAPA,
       SERIE: maq.SERIE,
       Modelo: maq.Modelo,
+      Faltam: maq.Faltam
     })
   );
 

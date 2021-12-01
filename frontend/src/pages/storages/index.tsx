@@ -38,7 +38,13 @@ const Storages = (): JSX.Element => {
       width: 90,
       align: "center",
       renderCell: (params) => (
-        <div style={{ display: 'flex', flex: 1, borderRight: `10px solid ${params.row.Faltam > 0 ? '#ffee70' : '#a0e64c' }`}}>
+        <div
+          style={{
+            display: 'flex',
+            flex: 1,
+            borderRight: `10px solid ${params.row.Faltam > 0 ? '#ffee70' : '#a0e64c'}`
+          }}
+        >
           <Details
             DL={params.row.id}
             Filial={params.row.Filial}

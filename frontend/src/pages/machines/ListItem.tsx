@@ -8,11 +8,10 @@ import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 
 import { InputNumber } from "../../components/inputFormat";
 import { IListItemProps } from './machinesTypes'
-import { Toast } from '../../components/toasty'
 
-const ListItemCustom = ({ produto }: IListItemProps) => {
+const ListItemCustom = ({ produto, index, changeHandler }: IListItemProps) => {
   const [item, setItem] = useState({ ...produto })
-  const [oldQtd, setOldQtd] = useState<string | number | null>(produto.Qtd);
+  // const [oldQtd, setOldQtd] = useState<string | number | null>(produto.Qtd);
 
   const handleChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -22,27 +21,28 @@ const ListItemCustom = ({ produto }: IListItemProps) => {
       Qtd: event.target.value === '' || event.target.value === null ? 0 : event.target.value
     }
 
-    setOldQtd(item.Qtd)
+    // setOldQtd(item.Qtd)
     setItem(newItem)
 
-    try{
-      api.put('/inventory/machines/product', {
-        Line: newItem
-      })
-    }catch(err){
-      const newItem = {
-        ...item,
-        Qtd: oldQtd
-      }
-      setItem(newItem)
-      Toast('Falha ao salvar última alteracao', 'error')
-    }
+    api.put('/inventory/machines/product', {
+      Line: newItem
+    })
+    // .catch(() => {
+    //   const newItem = {
+    //     ...item,
+    //     Qtd: oldQtd
+    //   }
+
+    //   setItem(newItem)
+    //   Toast('Falha ao salvar última alteracao', 'error')
+    // })
+    changeHandler(newItem, index)
   }
 
   // const handleBlur = async () => {
-//     let toastId = null 
+  //     let toastId = null 
 
-// toastId = Toast('Aguarde...', 'wait')
+  // toastId = Toast('Aguarde...', 'wait')
   //   try {
   //     await api.put('/inventory/machines/product', {
   //       Line: item

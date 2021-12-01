@@ -112,7 +112,7 @@ const Details = ({ DL, Filial }: IDetailsProps): JSX.Element => {
                             <AccordionDetails>
                                 <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
                                     {DLInfo.pastMonthsDLInv.map(pastMonth =>
-                                        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                                        <div key={pastMonth.Refdt} style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                                             <Typography variant='subtitle1'>
                                                 {capitalizeMonthFirstLetter(moment(pastMonth.Refdt).format('MMMM'))}
                                             </Typography>
@@ -135,12 +135,12 @@ const Details = ({ DL, Filial }: IDetailsProps): JSX.Element => {
                         <AccordionDetails>
                             <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
                                 {DLInfo.pastMonthsDLEqInv.map(pastMonth =>
-                                    <>
+                                    <div key={pastMonth.Ref}>
                                         <Typography variant='subtitle1' gutterBottom={true}>
                                             <strong>{capitalizeMonthFirstLetter(pastMonth.Ref)}</strong>
                                         </Typography>
                                         {pastMonth.Eqs.map(EQ => (
-                                            <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                                            <div key={EQ.CHAPA} style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                                                 <Typography variant='subtitle2'>
                                                     {EQ.CHAPA}
                                                 </Typography>
@@ -150,7 +150,7 @@ const Details = ({ DL, Filial }: IDetailsProps): JSX.Element => {
                                             </div>
                                         ))}
 
-                                    </>
+                                    </div>
                                 )}
                             </div>
                         </AccordionDetails>

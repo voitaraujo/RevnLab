@@ -1,14 +1,8 @@
 import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
 
-import { decryptToken } from '../services/jwtAuth'
+import { decryptToken, IToken } from '../services/jwtAuth'
 import { InvMov } from '../entity/InvMov'
-
-interface IToken {
-    user_code: string,
-    user_name: string,
-    role: string,
-}
 
 export default {
     async See(req: Request, res: Response) {
@@ -20,7 +14,7 @@ export default {
         const Refs = await getRepository(InvMov).find({
             select: ['DLCod', 'Refdt', 'InvMovSeq', 'InvMovStatus'],
             where: {
-                GestorCod: verified.user_code,
+                GestorCod: verified.supervisor_code,
                 DLCod: DLid,
                 InvMovStatus: 0,
             }

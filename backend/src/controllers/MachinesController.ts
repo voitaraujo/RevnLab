@@ -5,13 +5,7 @@ import { getRepository, createQueryBuilder } from 'typeorm';
 import { Machines } from '../entity/Machines'
 import { MovMachines } from '../entity/MovMachines'
 import { Storages } from '../entity/Storages'
-import { decryptToken } from '../services/jwtAuth'
-
-interface IToken {
-    user_code: string,
-    user_name: string,
-    role: string,
-}
+import { decryptToken, IToken } from '../services/jwtAuth'
 
 interface IFaltaEmEq {
     Refdt: string,
@@ -30,7 +24,7 @@ export default {
         const users = verified && await getRepository(Storages).find({
             where: {
                 DLCod: DLid,
-                GestorCod: verified.user_code
+                GestorCod: verified.supervisor_code
             }
         })
 
@@ -82,7 +76,7 @@ export default {
         const users = verified && await getRepository(Storages).find({
             where: {
                 DLCod: DLid,
-                GestorCod: verified.user_code
+                GestorCod: verified.supervisor_code
             }
         })
 
@@ -99,7 +93,7 @@ export default {
                 }
             })
 
-            const ProdsFaltamEQ = await getPastStorageMovInfo(Chapa, DLid, verified.user_code)
+            const ProdsFaltamEQ = await getPastStorageMovInfo(Chapa, DLid, verified.supervisor_code)
 
             const completeStorage = machines && machines.length > 0 ? {
                 ...machines[0],
