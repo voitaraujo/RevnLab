@@ -1,10 +1,10 @@
-import { IMachineDetalhes, IRefs, IMachines } from '../../pages/machines/machinesTypes'
+import { IMachineDetalhes, IMachineRefs, IMachines, IProdutoInventário } from '../../../pages/machines/machinesTypes'
 
 export interface IMachinesActions {
     SetMachineDetails: (value: IMachineDetalhes) => void,
     SetDialogState: (value: boolean) => void,
     SetMachinesList: (value: IMachines[]) => void,
-    SetMachineRefs: (value: IRefs[]) => void
+    SetMachineRefs: (value: IMachineRefs[]) => void
 }
 
 export interface IMachinesState {
@@ -12,7 +12,8 @@ export interface IMachinesState {
     FullscreenDialogState: boolean,
     Machines: IMachines[],
     MachineDetails: IMachineDetalhes,
-    Refs: IRefs[]
+    Refs: IMachineRefs[],
+    Produtos: IProdutoInventário[]
 }
 
 export interface IComponentWithRedux extends IMachinesActions {

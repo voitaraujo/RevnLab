@@ -9,7 +9,7 @@ import Route from "./components/privateRoute";
 import { BottomAppBar } from './components/bottomAppBar'
 
 import Login from "./pages/login";
-import Storages from './pages/storages/index'
+import { Storages } from './pages/storages/index'
 import { Machines } from './pages/machines/index'
 import NotFound from "./pages/notFound";
 import Unauthorized from "./pages/unauthorized";

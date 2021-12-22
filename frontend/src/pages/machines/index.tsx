@@ -1,26 +1,32 @@
-﻿import React, { useState, useEffect } from "react";
+﻿//pacotes
+import React, { useState, useEffect } from "react";
 import { connect } from 'react-redux';
 import { bindActionCreators, Dispatch } from 'redux';
-
 import { useParams } from "react-router-dom";
-import { Toast } from "../../components/toasty";
+
+//serviços e funções
 import { api } from "../../services/api";
 
+//componentes visuais
+import { Toast } from "../../components/toasty";
 import { InfoOutlined } from "@material-ui/icons";
 import { DataGrid, GridColDef } from "@material-ui/data-grid";
-
-import { Details } from './details'
 import { Loading } from "../../components/loading";
 import { ClearButton } from '../../components/buttons'
 
-import { IMachinesState } from '../../global/reducer/MachineReducerTypes'
-import { SetMachinesList, SetDialogState } from '../../global/actions/MachineActions'
-import { IStore } from '../../global/store/storeTypes'
-import { IIndexParams, IIndexPropsWithRedux, IIndexLoadDTO, IMachines } from './machinesTypes'
+//componentes funcionais
+import { Details } from './details'
 
-const MachinesWithRedux = ({ State, SetMachinesList, SetDialogState }: IIndexPropsWithRedux): JSX.Element => {
+//tipos e interfaces
+import { IMachinesState } from '../../global/reducer/MachinesReducer/MachineReducerTypes'
+import { IStore } from '../../global/store/storeTypes'
+import { IIndexParams, IIndexPropsWithRedux, IIndexLoadDTO, IMachines, IMachineDetalhes, IMachineRefs } from './machinesTypes'
+
+//redux actions
+import { SetMachinesList, SetDialogState, SetMachineDetails, SetMachineRefs } from '../../global/actions/Machine/MachineActions'
+
+const MachinesWithRedux = ({ State, SetMachinesList, SetDialogState, SetMachineDetails, SetMachineRefs }: IIndexPropsWithRedux): JSX.Element => {
   const [fetching, setFetching] = useState<boolean>(true);
-  const [chapaTarget, setChapaTarget] = useState<string>('');
 
   const Params = useParams<IIndexParams>();
   const columns: GridColDef[] = [
@@ -60,23 +66,17 @@ const MachinesWithRedux = ({ State, SetMachinesList, SetDialogState }: IIndexPro
             flex: 1,
             borderRight: `10px solid ${params.row.Faltam > 0 ? '#ffee70' : '#a0e64c'}`
           }}
-          >
+        >
           <ClearButton
             disabled={false}
             label={<InfoOutlined />}
-            onClick={() => handleOpenMachineDetails(String(params.id))}
+            onClick={() => handleOpenMachineDetails(Params.DL, String(params.id))}
           />
         </div>
       ),
     },
   ];
 
-  const handleOpenMachineDetails = (CHAPA: string) => {
-    setChapaTarget(CHAPA)
-    SetDialogState(true)
-  }
-
-  //carrega a lista de máquinas do DL
   useEffect(() => {
     async function load() {
       try {
@@ -92,11 +92,25 @@ const MachinesWithRedux = ({ State, SetMachinesList, SetDialogState }: IIndexPro
     load();
   }, [Params.DL, SetMachinesList]);
 
+  const handleOpenMachineDetails = async (DLCOD: string, CHAPA: string) => {
+    SetDialogState(true)
+
+    try {
+      const responseDepInfo = await api.get<IMachineDetalhes>(`/machines/details/${DLCOD}/${CHAPA}`);
+      const responseDepRefs = await api.get<{ Refs: IMachineRefs[] }>(`/references/storages/${DLCOD}`)
+
+      SetMachineDetails(responseDepInfo.data);
+      SetMachineRefs(responseDepRefs.data.Refs);
+    } catch (err) {
+      Toast("Não foi possivel recuperar as informações da máquina", "error");
+    }
+  }
+
   return fetching ? (
     <Loading />
   ) : (
     <>
-      <Details DLCod={Params.DL} Chapa={chapaTarget} />
+      <Details />
       <DataGrid
         style={{ height: 'calc(100% - 64px)' }}
         columns={columns}
@@ -118,10 +132,11 @@ const mapDispatchToProps = (dispatch: Dispatch<{ type: string }>) =>
   bindActionCreators(
     {
       SetDialogState,
-      SetMachinesList
+      SetMachinesList,
+      SetMachineDetails,
+      SetMachineRefs
     }
     , dispatch)
-
 
 export const Machines = connect<{
   State: IMachinesState
@@ -134,6 +149,14 @@ export const Machines = connect<{
     SetMachinesList: (value: IMachines[]) => {
       type: string;
       value: IMachines[];
+    };
+    SetMachineDetails: (value: IMachineDetalhes) => {
+      type: string;
+      value: IMachineDetalhes;
+    };
+    SetMachineRefs: (value: IMachineRefs[]) => {
+      type: string;
+      value: IMachineRefs[];
     };
   },
   unknown,

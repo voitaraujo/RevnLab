@@ -1,5 +1,7 @@
-import { IMachinesState } from '../reducer/MachineReducerTypes'
+import { IMachinesState } from '../reducer/MachinesReducer/MachineReducerTypes'
+import { IStoragesState } from '../reducer/StoragesReducer/StoragesReducerTypes'
 
 export interface IStore {
-    MachinesState: IMachinesState
+    MachinesState: IMachinesState,
+    StoragesState: IStoragesState
 }

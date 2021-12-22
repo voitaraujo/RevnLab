@@ -1,12 +1,19 @@
+//pacotes
 import React, { useState, memo } from "react";
+
+//serviços e funções
 import { api } from '../../services/api'
 
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
-import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
-
+//componentes visuais
+import { 
+  ListItem, 
+  ListItemIcon, 
+  ListItemText, 
+  ListItemSecondaryAction 
+} from "@material-ui/core/";
 import { InputNumber } from "../../components/inputFormat";
+
+//tipos e interfaces
 import { IListItemProps } from './machinesTypes'
 
 const ListItemCustom = ({ produto, index, changeHandler }: IListItemProps) => {
@@ -39,25 +46,6 @@ const ListItemCustom = ({ produto, index, changeHandler }: IListItemProps) => {
     changeHandler(newItem, index)
   }
 
-  // const handleBlur = async () => {
-  //     let toastId = null 
-
-  // toastId = Toast('Aguarde...', 'wait')
-  //   try {
-  //     await api.put('/inventory/machines/product', {
-  //       Line: item
-  //     })
-
-  //     setOldQtd(item.Qtd)
-  //     Toast('Salvo', 'success')
-  // Toast('Salvo!', 'update', toastId, 'success')
-  //   } catch (err) {
-  //     setItem({ ...item, Qtd: oldQtd })
-  //     Toast('Erro', 'error')
-  // Toast('Erro', 'update', toastId, 'error')
-  //   }
-  // }
-
   return (
     <ListItem>
       <ListItemIcon>{item.SEL}</ListItemIcon>
@@ -66,7 +54,6 @@ const ListItemCustom = ({ produto, index, changeHandler }: IListItemProps) => {
         <InputNumber
           decimals={0}
           onChange={handleChange}
-          // onBlur={handleBlur}
           disabled={false}
           label="Qtd"
           value={item.Qtd}

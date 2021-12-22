@@ -1,4 +1,4 @@
-import { IMachinesState } from '../../global/reducer/MachineReducerTypes'
+import { IMachinesState } from '../../global/reducer/MachinesReducer/MachineReducerTypes'
 
 //formato da lista de máquinas
 export interface IMachines {
@@ -10,19 +10,20 @@ export interface IMachines {
 }
 
 //props que o details.tsx tem que receber por instancia
-interface IDetailsProps {
-    DLCod: string,
-    Chapa: string
-}
+// interface IDetailsProps {
+// }
 
 //props que o details.tsx vai receber do redux
 interface IDetailsPropsFromRedux {
-    SetDialogState: (value: boolean) => void
+    SetDialogState: (value: boolean) => void,
+    SetMachineRefs: (value: IMachineRefs[]) => void,
+    SetMachineDetails: (value: IMachineDetalhes) => void,
     State: IMachinesState
 }
 
 //união de props que o details.tsx deve receber
-export type IDetailsPropsWithRedux = IDetailsProps & IDetailsPropsFromRedux
+// export type IDetailsPropsWithRedux = IDetailsProps & IDetailsPropsFromRedux
+export type IDetailsPropsWithRedux = IDetailsPropsFromRedux
 
 //formato dos detalhes da máquina
 export interface IMachineDetalhes {
@@ -49,7 +50,7 @@ export interface IProdutoInventário {
 }
 
 //formato das datas Referencia
-export interface IRefs {
+export interface IMachineRefs {
     DLCod: string;
     Refdt: string;
     InvMovSeq: number;
@@ -57,11 +58,16 @@ export interface IRefs {
 }
 
 //props que o inventory.tsx deve receber
-export interface IInventoryProps {
-    Info: IMachineDetalhes;
-    DLCod: string;
-    Refs: IRefs[];
+// export interface IInventoryProps {
+// }
+
+export interface IInventoryPropsFromRedux {
+    State: IMachinesState,
+    SetProdutos: (value: IProdutoInventário[]) => void,
 }
+// export type IInventoryPropsWithRedux = IInventoryProps & IInventoryPropsFromRedux
+export type IInventoryPropsWithRedux = IInventoryPropsFromRedux
+    
 
 //props que o ListItem.tsx deve receber
 export interface IListItemProps {
@@ -83,9 +89,11 @@ export interface IIndexLoadDTO {
 
 //props que o index.tsx deve receber do redux
 interface IIndexPropsFromRedux {
+    State: IMachinesState,
     SetDialogState: (value: boolean) => void,
     SetMachinesList: (value: IMachines[]) => void,
-    State: IMachinesState
+    SetMachineRefs: (value: IMachineRefs[]) => void,
+    SetMachineDetails: (value: IMachineDetalhes) => void
 }
 
 //props que o index.tsx deve receber por instancia

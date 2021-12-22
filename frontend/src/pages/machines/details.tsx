@@ -1,152 +1,137 @@
-import React, { useState, useEffect } from 'react'
+//pacotes
+import React from 'react'
 import { bindActionCreators, Dispatch } from 'redux'
 import { connect } from 'react-redux'
-import { api } from "../../services/api";
-import { Toast } from "../../components/toasty";
 import moment from 'moment'
 
-import { ExpandMore } from "@material-ui/icons";
-import Typography from "@material-ui/core/Typography";
-import Accordion from '@material-ui/core/Accordion';
-import AccordionDetails from '@material-ui/core/AccordionDetails';
-import AccordionSummary from '@material-ui/core/AccordionSummary';
-
-import {
-    DraggableDialogControlled
-} from "../../components/dialogs";
-import { Inventory } from './inventory'
-import { Loading } from "../../components/loading";
+//serviços e funções
 import { capitalizeMonthFirstLetter } from "../../misc/commomFunctions";
 
-import { IMachinesState } from '../../global/reducer/MachineReducerTypes'
-import { SetDialogState, SetMachineDetails, SetMachineRefs } from '../../global/actions/MachineActions'
+//componentes visuais
+import { ExpandMore } from "@material-ui/icons";
+import {
+  Typography,
+  Accordion,
+  AccordionDetails,
+  AccordionSummary
+} from "@material-ui/core/";
+import {
+  DraggableDialogControlled
+} from "../../components/dialogs";
+import { Loading } from "../../components/loading";
+
+//componentes funcionais
+import { Inventory } from './inventory'
+
+//tipos e interfaces
+import { IMachinesState } from '../../global/reducer/MachinesReducer/MachineReducerTypes'
 import { IStore } from '../../global/store/storeTypes'
-import { IDetailsPropsWithRedux, IMachineDetalhes, IRefs } from './machinesTypes'
+import { IDetailsPropsWithRedux, IMachineDetalhes, IMachineRefs } from './machinesTypes'
 
-const DetailsWithState = ({ DLCod, Chapa, SetDialogState, State }: IDetailsPropsWithRedux): JSX.Element => {
-    const [machineInfo, setMachineInfo] = useState<IMachineDetalhes>(DetailsInitialState);
-    const [refs, setRefs] = useState<IRefs[]>([])
-    const [fetching, setFetching] = useState<boolean>(true);
+//redux actions
+import { SetDialogState, SetMachineDetails, SetMachineRefs } from '../../global/actions/Machine/MachineActions'
 
-    useEffect(() => {
-        async function handleOpen() {
-            try {
-                const responseDepInfo = await api.get<IMachineDetalhes>(`/machines/details/${DLCod}/${Chapa}`);
-                const responseDepRefs = await api.get<{ Refs: IRefs[] }>(`/references/storages/${DLCod}`)
+const DetailsWithState = ({ State, SetDialogState, SetMachineRefs, SetMachineDetails }: IDetailsPropsWithRedux): JSX.Element => {
 
-                setMachineInfo(responseDepInfo.data);
-                setRefs(responseDepRefs.data.Refs);
-                setFetching(false)
-            } catch (err) {
-                Toast("Não foi possivel recuperar as informações da máquina", "error");
-            }
-        }
-        if (State.DialogState) {
-            handleOpen()
-        }
-    }, [State.DialogState, DLCod, Chapa])
+  const handleCloseDialog = () => {
+    SetDialogState(false);
+    SetMachineDetails(DetailsInitialState);
+    SetMachineRefs([]);
+  };
 
-    const handleCloseDialog = () => {
-        SetMachineRefs([]);
-        SetDialogState(false);
-        SetMachineDetails(DetailsInitialState);
-        setFetching(true)
-    };
+  return (
+    <DraggableDialogControlled
+      open={State.DialogState}
+      title={`Máquina ${State.MachineDetails.Modelo}`}
+      onClose={handleCloseDialog}
+      extraActions={
+        <Inventory />
+      }
+    >
+      {State.MachineDetails.CHAPA === '' ? <Loading /> : (
+        <>
+          <Typography gutterBottom variant="subtitle1">
+            CHAPA: <strong>{State.MachineDetails.CHAPA}</strong>
+          </Typography>
+          <Typography gutterBottom variant="subtitle1">
+            Série: <strong>{State.MachineDetails.SERIE}</strong>
+          </Typography>
+          <Typography gutterBottom variant="subtitle1">
+            Código do Depósito: <strong>{State.MachineDetails.DL}</strong>
+          </Typography>
+          <Typography gutterBottom variant="subtitle1">
+            Filial: <strong>{State.MachineDetails.N1_ZZFILIA}</strong>
+          </Typography>
+          {State.MachineDetails.pastMonthsEqInv.length > 0 ? (
+            <Accordion>
+              <AccordionSummary
+                expandIcon={<ExpandMore />}
+              >
+                <Typography>Pendencias EQ</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+                  {State.MachineDetails.pastMonthsEqInv.map(pastMonth =>
+                    <div key={pastMonth.Refdt} style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                      <Typography variant='subtitle1'>
+                        {capitalizeMonthFirstLetter(moment(pastMonth.Refdt).format('MMMM'))}
+                      </Typography>
+                      <Typography variant='subtitle1'>
+                        <strong>{pastMonth.Faltam} Produtos</strong>
+                      </Typography>
+                    </div>
+                  )}
+                </div>
+              </AccordionDetails>
+            </Accordion>
+          ) : null}
+        </>
+      )}
 
-    return (
-        <DraggableDialogControlled
-            open={State.DialogState}
-            title={`Máquina ${machineInfo.Modelo}`}
-            onClose={handleCloseDialog}
-            extraActions={
-                <Inventory Info={machineInfo} DLCod={DLCod} Refs={refs} />
-            }
-        >
-            {fetching ? <Loading /> : (
-                <>
-                    <Typography gutterBottom variant="subtitle1">
-                        CHAPA: <strong>{machineInfo.CHAPA}</strong>
-                    </Typography>
-                    <Typography gutterBottom variant="subtitle1">
-                        Série: <strong>{machineInfo.SERIE}</strong>
-                    </Typography>
-                    <Typography gutterBottom variant="subtitle1">
-                        Código do Depósito: <strong>{machineInfo.DL}</strong>
-                    </Typography>
-                    <Typography gutterBottom variant="subtitle1">
-                        Filial: <strong>{machineInfo.N1_ZZFILIA}</strong>
-                    </Typography>
-                    {machineInfo.pastMonthsEqInv.length > 0 ? (
-                        <Accordion>
-                            <AccordionSummary
-                                expandIcon={<ExpandMore />}
-                            >
-                                <Typography>Pendencias EQ</Typography>
-                            </AccordionSummary>
-                            <AccordionDetails>
-                                <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-                                    {machineInfo.pastMonthsEqInv.map(pastMonth =>
-                                        <div key={pastMonth.Refdt} style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                                            <Typography variant='subtitle1'>
-                                                {capitalizeMonthFirstLetter(moment(pastMonth.Refdt).format('MMMM'))}
-                                            </Typography>
-                                            <Typography variant='subtitle1'>
-                                                <strong>{pastMonth.Faltam} Produtos</strong>
-                                            </Typography>
-                                        </div>
-                                    )}
-                                </div>
-                            </AccordionDetails>
-                        </Accordion>
-                    ) : null}
-                </>
-            )}
-
-        </DraggableDialogControlled>
-    )
+    </DraggableDialogControlled>
+  )
 }
 
 const mapStateToProps = (store: IStore) => ({
-    State: store.MachinesState
+  State: store.MachinesState
 })
 
 const mapDispatchToProps = (dispatch: Dispatch<{ type: string }>) =>
-    bindActionCreators(
-        {
-            SetDialogState,
-            SetMachineDetails,
-            SetMachineRefs
-        },
-        dispatch
-    );
+  bindActionCreators(
+    {
+      SetDialogState,
+      SetMachineDetails,
+      SetMachineRefs
+    },
+    dispatch
+  );
 
 export const Details = connect<{
-    State: IMachinesState;
+  State: IMachinesState;
 }, {
-    SetDialogState: (value: boolean) => {
-        type: string;
-        value: boolean;
-    };
-    SetMachineDetails: (value: IMachineDetalhes) => {
-        type: string;
-        value: IMachineDetalhes;
-    };
-    SetMachineRefs: (value: IRefs[]) => {
-        type: string;
-        value: IRefs[];
-    };
-}, {
-    DLCod: string,
-    Chapa: string
-}, IStore>(mapStateToProps, mapDispatchToProps)(DetailsWithState)
+  SetDialogState: (value: boolean) => {
+    type: string;
+    value: boolean;
+  };
+  SetMachineDetails: (value: IMachineDetalhes) => {
+    type: string;
+    value: IMachineDetalhes;
+  };
+  SetMachineRefs: (value: IMachineRefs[]) => {
+    type: string;
+    value: IMachineRefs[];
+  };
+},
+  unknown,
+  IStore>(mapStateToProps, mapDispatchToProps)(DetailsWithState)
 
 const DetailsInitialState = {
-    N1_ZZFILIA: "",
-    CHAPA: "",
-    SERIE: "",
-    CLICOD: "",
-    CLILJ: "",
-    DL: "",
-    Modelo: "",
-    pastMonthsEqInv: []
+  N1_ZZFILIA: "",
+  CHAPA: "",
+  SERIE: "",
+  CLICOD: "",
+  CLILJ: "",
+  DL: "",
+  Modelo: "",
+  pastMonthsEqInv: []
 };

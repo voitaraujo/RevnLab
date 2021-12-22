@@ -2,10 +2,16 @@ import {
   MACHINES_LOAD_DETAILS_INFO,
   MACHINES_DIALOG_STATE,
   MACHINES_LOAD_ALL,
-  MACHINES_LOAD_REFS
+  MACHINES_LOAD_REFS,
+  MACHINES_LOAD_PRODUTOS
 } from './MachineActionsTypes'
 
-import { IRefs, IMachineDetalhes, IMachines } from '../../pages/machines/machinesTypes'
+import { 
+  IMachineRefs, 
+  IMachineDetalhes, 
+  IMachines,
+  IProdutoInventário
+} from '../../../pages/machines/machinesTypes'
 
 export const SetMachinesList = (value: IMachines[]): {
   type: string,
@@ -25,9 +31,9 @@ export const SetMachineDetails = (value: IMachineDetalhes): {
   })
 };
 
-export const SetMachineRefs = (value: IRefs[]): {
+export const SetMachineRefs = (value: IMachineRefs[]): {
   type: string,
-  value: IRefs[],
+  value: IMachineRefs[],
 } => {
   return ({
     type: MACHINES_LOAD_REFS,
@@ -40,5 +46,13 @@ export const SetDialogState = (value: boolean): {
   value: boolean,
 } => ({
   type: MACHINES_DIALOG_STATE,
+  value: value,
+});
+
+export const SetProdutos = (value: IProdutoInventário[]): {
+  type: string,
+  value: IProdutoInventário[],
+} => ({
+  type: MACHINES_LOAD_PRODUTOS,
   value: value,
 });

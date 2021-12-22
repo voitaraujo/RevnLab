@@ -1,43 +1,52 @@
+//pacotes
 import React, { useState, useEffect } from "react";
 import moment from "moment";
+import { bindActionCreators, Dispatch } from 'redux'
+import { connect } from 'react-redux'
+
+//serviços e funções
 import { api } from "../../services/api";
+import { capitalizeMonthFirstLetter } from '../../misc/commomFunctions'
 
+//componentes visuais
 import { ReceiptOutlined } from "@material-ui/icons";
-import List from "@material-ui/core/List";
-import Divider from "@material-ui/core/Divider";
-import MenuItem from "@material-ui/core/MenuItem";
-import Typography from "@material-ui/core/Typography";
-
+import { List, Divider, MenuItem, Typography } from "@material-ui/core/";
 import { FullScreenDialog } from "../../components/dialogs";
 import { Toast } from "../../components/toasty";
 import { SelectControlled } from "../../components/select";
 import { Loading } from "../../components/loading";
-import { capitalizeMonthFirstLetter } from '../../misc/commomFunctions'
 
+//componentes funcionais
 import { ListItemMemo } from './ListItem'
 
-import { IInventoryProps, IDepositoInventario } from './storageTypes'
+//tipos e interfaces
+import { IDepositoInventario, IInventoryPropsWithRedux } from './storageTypes'
+import { IStoragesState } from '../../global/reducer/StoragesReducer/StoragesReducerTypes'
+import { IStore } from '../../global/store/storeTypes'
 
-export const Inventory = ({ Info, Refs }: IInventoryProps): JSX.Element => {
-  const [produtos, setProdutos] = useState<IDepositoInventario[]>([]);
+//redux actions
+import { SetProdutos } from '../../global/actions/Storage/StorageActions'
+
+const InventoryWithRedux = ({ State, SetProdutos }: IInventoryPropsWithRedux): JSX.Element => {
   const [fetching, setFetching] = useState<boolean>(false);
   const [tipo, setTipo] = useState<string>("INSUMOS");
   const [selectedRef, setSelectedRef] = useState('');
 
-  let backupProdutos: IDepositoInventario[] = [...produtos]
+  let backupProdutos: IDepositoInventario[] = [...State.Produtos];
 
   useEffect(() => {
     if (
       selectedRef !== '' &&
       tipo !== '' &&
-      Info.Filial !== '' &&
-      Info.DLCod !== ''
+      State.StorageDetails.Filial !== '' &&
+      State.StorageDetails.DLCod !== ''
     ) {
-      loadInventoryDetails(Info.DLCod, Info.Filial, tipo, selectedRef)
+      loadInventoryDetails(State.StorageDetails.DLCod, State.StorageDetails.Filial, tipo, selectedRef)
     } else {
-      setProdutos([])
+      SetProdutos([])
     }
-  }, [Info.DLCod, Info.Filial, tipo, selectedRef])
+    // eslint-disable-next-line
+  }, [State.StorageDetails.DLCod, State.StorageDetails.Filial, tipo, selectedRef])
 
   const loadInventoryDetails = async (
     DLCOD: string,
@@ -51,7 +60,7 @@ export const Inventory = ({ Info, Refs }: IInventoryProps): JSX.Element => {
         `/inventory/storages/${DLCOD}/${FILIAL}/${Category}/${moment(Refdt).format('YYYY-MM-DD')}/`
       );
 
-      setProdutos(response.data);
+      SetProdutos(response.data);
       backupProdutos = [...response.data]
       setFetching(false);
     } catch (err) {
@@ -61,39 +70,23 @@ export const Inventory = ({ Info, Refs }: IInventoryProps): JSX.Element => {
   };
 
   const handleClose = () => {
-    setProdutos([]);
+    SetProdutos([]);
     setFetching(false);
     setSelectedRef('')
     setTipo('INSUMOS')
   };
 
-  const ApplyChangesToState = (item: IDepositoInventario, index: number) => {
+  const ApplyChangesToBackup = (item: IDepositoInventario, index: number) => {
     backupProdutos[index] = item
   }
 
   const handleSubmit = async (): Promise<boolean> => {
     let shouldCloseModal = true;
 
-    if (produtos.length === 0) {
+    if (State.Produtos.length === 0) {
       Toast("Inventário vazio", "warn");
       shouldCloseModal = false;
     }
-
-    // for (let i = 0; i < produtos.length; i++) {
-    //   if (
-    //     produtos[i].Qtd === "" ||
-    //     produtos[i].Qtd === null ||
-    //     typeof produtos[i].Qtd == "undefined"
-    //   ) {
-    //     Toast(
-    //       "Qtd. de um ou mais itens do inventário não informados",
-    //       "warn"
-    //     );
-    //     shouldCloseModal = false;
-    //     break;
-    //   }
-    // }
-
 
     if (shouldCloseModal) {
       let toastId = null
@@ -117,7 +110,7 @@ export const Inventory = ({ Info, Refs }: IInventoryProps): JSX.Element => {
 
   return (
     <FullScreenDialog
-      title={`Inventário de ${Info.DLNome}`}
+      title={`Inventário de ${State.StorageDetails.DLNome}`}
       buttonIcon={<ReceiptOutlined />}
       buttonLabel="Inventário"
       buttonColor="primary"
@@ -134,7 +127,7 @@ export const Inventory = ({ Info, Refs }: IInventoryProps): JSX.Element => {
         variant="outlined"
         enableVoidSelection={true}
       >
-        {Refs.map(ref => (
+        {State.Refs.map(ref => (
           <MenuItem value={ref.Refdt} key={ref.Refdt}>{capitalizeMonthFirstLetter(moment(ref.Refdt).format('MMMM'))}</MenuItem>
         ))}
       </SelectControlled>
@@ -153,7 +146,7 @@ export const Inventory = ({ Info, Refs }: IInventoryProps): JSX.Element => {
         <Loading />
       ) : (
         <List>
-          {produtos.length === 0 ? (
+          {State.Produtos.length === 0 ? (
             <div
               style={{
                 display: "flex",
@@ -166,12 +159,12 @@ export const Inventory = ({ Info, Refs }: IInventoryProps): JSX.Element => {
               </Typography>
             </div>
           ) : (
-            produtos.map((item, i) => (
+            State.Produtos.map((item, i) => (
               <div key={item.PROD}>
                 <ListItemMemo
                   produto={item}
                   index={i}
-                  changeHandler={ApplyChangesToState}
+                  changeHandler={ApplyChangesToBackup}
                 />
                 <Divider />
               </div>
@@ -182,3 +175,26 @@ export const Inventory = ({ Info, Refs }: IInventoryProps): JSX.Element => {
     </FullScreenDialog>
   );
 };
+
+const mapStateToProps = (store: IStore) => ({
+  State: store.StoragesState
+})
+
+const mapDispatchToProps = (dispatch: Dispatch<{ type: string }>) =>
+  bindActionCreators(
+    {
+      SetProdutos
+    }
+    , dispatch)
+
+export const Inventory = connect<{
+  State: IStoragesState
+},
+  {
+    SetProdutos: (value: IDepositoInventario[]) => {
+      type: string;
+      value: IDepositoInventario[];
+    };
+  },
+  unknown,
+  IStore>(mapStateToProps, mapDispatchToProps)(InventoryWithRedux);

@@ -1,3 +1,5 @@
+import { IStoragesState } from '../../global/reducer/StoragesReducer/StoragesReducerTypes'
+
 //formato dos detalhes do depósito
 export interface IDepositoDetalhes {
     Filial: string;
@@ -14,9 +16,9 @@ export interface IDepositoDetalhes {
     DLStatus: string;
     DLLoja: string;
     pastMonthsDLInv: IPastMonthsDLData[],
-    pastMonthsDLEqInv: { 
-        Ref: string, 
-        Eqs: IPastMonthsDLEqData[] 
+    pastMonthsDLEqInv: {
+        Ref: string,
+        Eqs: IPastMonthsDLEqData[]
     }[]
 }
 
@@ -29,10 +31,18 @@ export interface IRefs {
 }
 
 //props que o details.tsx deve receber
-export interface IDetailsProps {
-    DL: string
-    Filial: string
+// export interface IDetailsProps {
+// }
+
+export interface IDetailsPropsFromRedux {
+    State: IStoragesState,
+    SetStorageDetails: (value: IDepositoDetalhes) => void,
+    SetStorageRefs: (value: IRefs[]) => void,
+    SetDialogState: (value: boolean) => void,
 }
+
+// export type IDetailsPropsWithRedux = IDetailsProps & IDetailsPropsFromRedux
+export type IDetailsPropsWithRedux = IDetailsPropsFromRedux
 
 //formato da lista de depósitos
 export interface IDepositos {
@@ -57,10 +67,16 @@ export interface IDepositoInventario {
     Qtd: number | string | null;
 }
 
-export interface IInventoryProps {
-    Info: IDepositoDetalhes;
-    Refs: IRefs[];
+// export interface IInventoryProps {
+// }
+
+export interface IInventoryPropsFromRedux {
+    State: IStoragesState,
+    SetProdutos: (value: IDepositoInventario[]) => void
 }
+
+// export type IInventoryPropsWithRedux = IInventoryProps & IInventoryPropsFromRedux
+export type IInventoryPropsWithRedux = IInventoryPropsFromRedux
 
 interface IPastMonthsDLData {
     DLCod: string,
@@ -78,4 +94,12 @@ export interface IListItemProps {
     produto: IDepositoInventario;
     index: number;
     changeHandler: (item: IDepositoInventario, index: number) => void;
-  }
+}
+
+export interface IIndexPropsFromRedux {
+    SetStoragesList: (value: IDepositos[]) => void,
+    SetDialogState: (value: boolean) => void,
+    SetStorageDetails: (value: IDepositoDetalhes) => void,
+    SetStorageRefs: (value: IRefs[]) => void,
+    State: IStoragesState
+}
