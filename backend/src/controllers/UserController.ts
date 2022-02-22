@@ -21,16 +21,7 @@ export default {
     const { user, password }: ILoginDTO = req.body
     const entityManager = getManager();
 
-    // const users = await getRepository(Users).find({
-    //   where: {
-    //     GestorCod: user.trim(),
-    //     GestorSenha: password.trim()
-    //   }
-    // })
-
-    const users = await <Promise<IUserJoin[]>>entityManager.query(`select A.GestorCod as UsuarioCod, A.GestorNome as UsuarioNome,  B.GestorCod as SupervisorCod, B.GestorSup as SupervisorNome 
-    from dbo.InvGestor as A left join dbo.InvGestor as B on A.GestorSup = B.GestorNome
-    where A.GestorCod = ${user} and A.GestorSenha = ${password}`, []);
+    const users = await <Promise<IUserJoin[]>>entityManager.query(`select A.GestorCod as UsuarioCod, A.GestorNome as UsuarioNome,  B.GestorCod as SupervisorCod, B.GestorSup as SupervisorNome from dbo.InvGestor as A left join dbo.InvGestor as B on A.GestorSup = B.GestorNome where A.GestorCod = ${user} and A.GestorSenha = ${password}`);
 
     const token = users[0] && genToken(users[0].UsuarioCod, users[0].UsuarioNome, users[0].SupervisorCod, 'lider')
 

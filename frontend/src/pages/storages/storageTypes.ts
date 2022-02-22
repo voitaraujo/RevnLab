@@ -4,7 +4,6 @@ import { IStoragesState } from '../../global/reducer/StoragesReducer/StoragesRed
 export interface IDepositoDetalhes {
     Filial: string;
     DLCod: string;
-    GestorCod: string;
     DLQtEq: number;
     DLNome: string;
     DLEndereco: string;

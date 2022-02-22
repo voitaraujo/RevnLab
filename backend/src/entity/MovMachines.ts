@@ -8,12 +8,6 @@ export class MovMachines {
     Refdt!: string;
 
     @PrimaryColumn({
-        length: 11,
-        type: 'varchar'
-    })
-    GestorCod!: string;
-
-    @PrimaryColumn({
         length: 4,
         type: 'varchar'
     })
@@ -53,4 +47,9 @@ export class MovMachines {
         type: 'decimal'
     })
     Qtd!: number;
+
+    @Column({
+        type: 'smalldatetime'
+    })
+    lastupdate!: Date;
 }

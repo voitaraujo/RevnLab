@@ -33,7 +33,6 @@ export default {
                 Refdt: Refdt,
                 DLCod: DLid,
                 Filial: Filial,
-                GestorCod: verified.supervisor_code,
                 Tipo: Category === 'INSUMOS' ? 'I' : 'N'
             }
         })
@@ -57,7 +56,8 @@ export default {
                 .createQueryBuilder()
                 .update(MovStorages)
                 .set({
-                    Qtd: item.Qtd === null ? undefined : Number(item.Qtd)
+                    Qtd: item.Qtd === null ? undefined : Number(item.Qtd),
+                    lastupdate: new Date() 
                 })
                 .where("Refdt = :Refdt AND DLCod = :DLCod AND Filial = :Filial AND PROD = :PROD", { Refdt: item.Refdt, DLCod: item.DLCod, Filial: item.Filial, PROD: item.PROD })
                 .execute()
@@ -78,7 +78,8 @@ export default {
             .createQueryBuilder()
             .update(MovStorages)
             .set({
-                Qtd: Number(Line.Qtd)
+                Qtd: Number(Line.Qtd),
+                lastupdate: new Date()
             })
             .where(
                 "Refdt = :Refdt AND DLCod = :DLCod AND Filial = :Filial AND PROD = :PROD",

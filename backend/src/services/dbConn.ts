@@ -2,6 +2,7 @@ import chalk from "chalk";
 import "reflect-metadata";
 
 import { createConnection } from "typeorm";
+
 import { Users } from "../entity/Users";
 import { Storages } from "../entity/Storages";
 import { MovStorages } from "../entity/MovStorages";

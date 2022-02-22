@@ -16,7 +16,6 @@ const initialState: IStoragesState = {
   StorageDetails: {
     Filial: '',
     DLCod: '',
-    GestorCod: '',
     DLQtEq: 0,
     DLNome: '',
     DLEndereco: '',

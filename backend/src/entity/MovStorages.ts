@@ -8,12 +8,6 @@ export class MovStorages {
     Refdt!: string;
 
     @PrimaryColumn({
-        length: 11,
-        type: 'varchar'
-    })
-    GestorCod!: string;
-
-    @PrimaryColumn({
         length: 4,
         type: 'varchar'
     })
@@ -47,4 +41,9 @@ export class MovStorages {
         length: 1
     })
     Tipo!: string;
+
+    @Column({
+        type: 'smalldatetime'
+    })
+    lastupdate!: Date;
 }

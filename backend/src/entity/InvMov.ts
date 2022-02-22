@@ -35,6 +35,4 @@ export class InvMov {
         length: 1,
     })
     InvMovStatus!: string;
-
-
 }

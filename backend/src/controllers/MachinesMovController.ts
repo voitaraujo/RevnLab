@@ -36,7 +36,6 @@ export default {
             select: ['DLCod', 'SEL', 'PRODUTO', 'PROD', 'Qtd', 'Refdt', 'Filial', 'CHAPA'],
             where: {
                 Refdt: Refdt,
-                GestorCod: verified.supervisor_code,
                 DLCod: DLid,
                 CHAPA: Chapa,
             }
@@ -58,7 +57,8 @@ export default {
                 .createQueryBuilder()
                 .update(MovMachines)
                 .set({
-                    Qtd: item.Qtd === null ? undefined : Number(item.Qtd)
+                    Qtd: item.Qtd === null ? undefined : Number(item.Qtd),
+                    lastupdate: new Date()
                 })
                 .where("Refdt = :Refdt AND Filial = :Filial AND DLCod = :DL AND CHAPA = :CHAPA AND SEL = :SEL AND PROD = :CodProd",
                     { Refdt: item.Refdt, Filial: item.Filial, DL: item.DLCod, CHAPA: item.CHAPA, SEL: item.SEL, CodProd: item.PROD })
@@ -80,7 +80,8 @@ export default {
             .createQueryBuilder()
             .update(MovMachines)
             .set({
-                Qtd: Number(Line.Qtd)
+                Qtd: Number(Line.Qtd),
+                lastupdate: new Date()
             })
             .where(
                 "Refdt = :Refdt AND Filial = :Filial AND DLCod = :DL AND CHAPA = :CHAPA AND SEL = :SEL AND PROD = :CodProd",

@@ -15,12 +15,6 @@ export class Storages {
     DLCod!: string;
 
     @Column({
-        length: 11,
-        type: 'varchar'
-    })
-    GestorCod!: string;
-
-    @Column({
         type: 'int'
     })
     DLQtEq!: number;

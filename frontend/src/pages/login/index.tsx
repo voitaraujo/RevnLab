@@ -46,10 +46,14 @@ function Login(): JSX.Element {
     }
   };
 
-  const handleLogin = async () => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement> | null) => {
     setWait(true);
-    
-    let toastId = null 
+
+    if (e !== null) {
+      e.preventDefault()
+    }
+
+    let toastId = null
     toastId = Toast('Aguarde...', 'wait')
 
     try {
@@ -80,34 +84,36 @@ function Login(): JSX.Element {
         <CardHeader
           avatar={
             <Avatar aria-label="recipe" className={classes.avatar}>
-              RL
+              IV
             </Avatar>
           }
-          title="RevnLab"
+          title="Inventário"
           subheader="Login"
         />
         <CardContent>
-          <InputPhone
-            disabled={wait}
-            focus={true}
-            label="Código de Acesso"
-            mask="(##) # ####-####"
-            onChange={handleUpdateUserCode}
-            value={userCode}
-            type="standard"
-          />
-          <InputSimple
-            onChange={handleUpdateUserPassword}
-            label="Senha"
-            value={userPassword}
-            type="password"
-            disabled={wait}
-          />
+          <form onSubmit={e => handleLogin(e)}>
+            <InputPhone
+              disabled={wait}
+              focus={true}
+              label="Código de Acesso"
+              mask="(##) # ####-####"
+              onChange={handleUpdateUserCode}
+              value={userCode}
+              type="standard"
+            />
+            <InputSimple
+              onChange={handleUpdateUserPassword}
+              label="Senha"
+              value={userPassword}
+              type="password"
+              disabled={wait}
+            />
+          </form>
         </CardContent>
         <CardActions>
           <ClearButton
             label="Acessar"
-            onClick={handleLogin}
+            onClick={() => handleLogin(null)}
             disabled={shouldEnableLogin()}
             icon={<Input />}
           />

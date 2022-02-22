@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import moment from 'moment'
-import { getRepository, createQueryBuilder } from 'typeorm';
+import { getRepository, createQueryBuilder, getManager } from 'typeorm';
 
-import { Storages } from '../entity/Storages'
+// import { Storages } from '../entity/Storages'
 import { MovStorages } from '../entity/MovStorages'
 import { MovMachines } from '../entity/MovMachines'
 import { decryptToken, IToken } from '../services/jwtAuth'
@@ -11,25 +11,38 @@ interface IFaltaEmDL { DLCod: string, Refdt: string, FaltamProdutos: number }
 
 interface IFaltaEmEQ { Refdt: string, CHAPA: string, Faltam: number }
 
+interface IStoragesCab {
+  DLCod: string,
+  Filial: string,
+  DLNome: string,
+}
+
+interface IStorageAll {
+  Filial: string
+  DLCod: string
+  DLQtEq: number
+  DLNome: string
+  DLEndereco: string
+  DLBairro: string
+  DLCEP: string
+  DLUF: string
+  DLMunicipio: string
+  DLMunicipioCod: string
+  DLStatus: string
+  DLLoja: string
+}
+
 export default {
   async Show(req: Request, res: Response) {
     const token = req.get('Authorization')
+    const entityManager = getManager();
 
     const verified = <IToken>decryptToken(token!)
     const mesAnterior = moment().subtract(1, 'month').startOf('month').format("YYYY-MM-DD hh:mm:ss").replace('12:', '00:')
 
-    const storagesCab = await getRepository(Storages).find({
-      select: ['DLCod', 'DLNome', 'Filial'],
-      where: {
-        GestorCod: verified.supervisor_code,
-        DLStatus: 'S',
-      },
-      order: {
-        DLCod: 'ASC'
-      }
-    })
+    const storagesCab = await <Promise<IStoragesCab[]>>entityManager.query(`select distinct ID.DLCod, ID.Filial, ID.DLNome from dbo.InvDL as ID inner join dbo.InvMov as IM on ID.DLCod = IM.DLCod and ID.Filial = IM.Filial where IM.GestorCod = ${verified.supervisor_code} and ID.DLStatus = 'S'`);
 
-    const faltamStorages = await getCurrentMonthStorageMovInfo(verified.supervisor_code, mesAnterior)
+    const faltamStorages = await getCurrentMonthStorageMovInfo(mesAnterior)
 
     let storages: { DLCod: string, DLNome: string, Filial: string, Faltam: number }[] = []
 
@@ -59,19 +72,14 @@ export default {
     const token = req.get('Authorization')
     const DLid = req.params.DL
     const Filial = req.params.Filial
+    const entityManager = getManager();
 
     const verified = <IToken>decryptToken(token!)
 
-    const storage = verified && await getRepository(Storages).find({
-      where: {
-        GestorCod: verified.supervisor_code,
-        DLCod: DLid,
-        Filial: Filial
-      }
-    })
+    const storage = await <Promise<IStorageAll[]>>entityManager.query(`select distinct ID.Filial,ID.DLCod,ID.DLQtEq,ID.DLNome,ID.DLEndereco,ID.DLBairro,ID.DLCEP,ID.DLUF,ID.DLMunicipio,ID.DLMunicipioCod,ID.DLStatus,ID.DLLoja from dbo.InvDL as ID inner join dbo.InvMov as IM on ID.DLCod = IM.DLCod and ID.Filial = IM.Filial where IM.GestorCod = ${verified.supervisor_code} and ID.DLStatus = 'S' and ID.DLCod = '${DLid}' and ID.Filial = '${Filial}'`);
 
-    const ProdsFaltamDL = await getPastStorageMovInfo(Filial, DLid, verified.supervisor_code)
-    const ProdsFaltamEQ = await getPastStorageMachinesMovInfo(Filial, DLid, verified.supervisor_code)
+    const ProdsFaltamDL = await getPastStorageMovInfo(Filial, DLid)
+    const ProdsFaltamEQ = await getPastStorageMachinesMovInfo(Filial, DLid)
 
     const completeStorage = storage && storage.length > 0 ? {
       ...storage[0],
@@ -87,16 +95,15 @@ export default {
   }
 }
 
-const getPastStorageMovInfo = async (filial: string, DLId: string, GestorCod: string): Promise<IFaltaEmDL[]> => {
+const getPastStorageMovInfo = async (filial: string, DLId: string): Promise<IFaltaEmDL[]> => {
   const RawQuery_MovStorage = getRepository(MovStorages).createQueryBuilder();
 
   RawQuery_MovStorage.select("DLCod")
     .addSelect("Refdt")
     .addSelect("COUNT(PROD)", "FaltamProdutos")
-    .where(`Qtd IS NULL AND Filial = '${filial}' AND DLCod = '${DLId}' AND GestorCod = '${GestorCod}'`)
+    .where(`Qtd IS NULL AND Filial = '${filial}' AND DLCod = '${DLId}'`)
     .groupBy("Refdt")
     .addGroupBy("DLCod")
-    .addGroupBy("GestorCod")
     .orderBy('Refdt', 'DESC');
 
   const _retorno = await RawQuery_MovStorage.getRawMany<IFaltaEmDL>()
@@ -104,13 +111,13 @@ const getPastStorageMovInfo = async (filial: string, DLId: string, GestorCod: st
   return _retorno
 }
 
-const getPastStorageMachinesMovInfo = async (filial: string, DLId: string, GestorCod: string): Promise<{ Ref: string, Eqs: IFaltaEmEQ[] }[]> => {
+const getPastStorageMachinesMovInfo = async (filial: string, DLId: string): Promise<{ Ref: string, Eqs: IFaltaEmEQ[] }[]> => {
   const RawQuery_MovEq = getRepository(MovMachines).createQueryBuilder();
 
   RawQuery_MovEq.select("Refdt")
     .addSelect("CHAPA")
     .addSelect("COUNT(PROD)", "Faltam")
-    .where(`Qtd is null and Filial = '${filial}' and DLCod = '${DLId}' AND GestorCod = '${GestorCod}'`)
+    .where(`Qtd is null and Filial = '${filial}' and DLCod = '${DLId}'`)
     .groupBy("DLCod")
     .addGroupBy("CHAPA")
     .addGroupBy("Refdt")
@@ -145,12 +152,12 @@ const getPastStorageMachinesMovInfo = async (filial: string, DLId: string, Gesto
   return _retorno
 }
 
-const getCurrentMonthStorageMovInfo = async (GestorCod: string, Referencia: string): Promise<{ DLCod: string, Faltam: number }[]> => {
+const getCurrentMonthStorageMovInfo = async (Referencia: string): Promise<{ DLCod: string, Faltam: number }[]> => {
   const RawQuery_MovStorage = getRepository(MovStorages).createQueryBuilder();
 
   RawQuery_MovStorage.select("DLCod")
     .addSelect("COUNT(PROD)", "Faltam")
-    .where(`Qtd IS NULL AND GestorCod = '${GestorCod}' AND Refdt = convert(smalldatetime, '${Referencia}', 101)`)
+    .where(`Qtd IS NULL AND Refdt = convert(smalldatetime, '${Referencia}', 101)`)
     .groupBy("DLCod")
     .orderBy('DLCod', 'DESC');
 

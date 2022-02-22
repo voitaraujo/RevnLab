@@ -183,7 +183,6 @@ export default Details
 const DetailsInitialState = {
   Filial: "",
   DLCod: "",
-  GestorCod: "",
   DLQtEq: 0,
   DLNome: "",
   DLEndereco: "",
