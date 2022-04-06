@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useHistory } from "react-router-dom";
 import { api } from "../../services/api";
 // import { useHistory } from 'react-router-dom'
 
@@ -23,8 +24,8 @@ function Login(): JSX.Element {
   const [userPassword, setUserPassword] = useState("");
   const [wait, setWait] = useState(false);
 
+  const history = useHistory();
   const classes = useStyles();
-  // const history = useHistory()
 
   const handleUpdateUserCode = (
     e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
@@ -69,9 +70,9 @@ function Login(): JSX.Element {
         window.sessionStorage.setItem("user", response.data.user);
       window.sessionStorage.setItem("ScreenDesc", "Depósitos");
 
-      // history.push('/inventario')
-      // aqui não da pra usar o history.push porque o sessionStorage não é sincrono(vou chegar em inventário mais rapido do que vou gravar o token no navegador, ai da erro na rota)
-      window.location.assign("/inventario");
+      setTimeout(() => {
+        history.push('/inventario')
+      }, 1000)
     } catch (err) {
       Toast('Número ou Senha incorretos!', 'update', toastId, 'error')
       setWait(false);
