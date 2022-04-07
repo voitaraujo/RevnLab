@@ -3,12 +3,12 @@ import "reflect-metadata";
 
 import { createConnection } from "typeorm";
 
-import { Users } from "../entity/Users";
-import { Storages } from "../entity/Storages";
-import { MovStorages } from "../entity/MovStorages";
-import { Machines } from "../entity/Machines";
-import { MovMachines } from "../entity/MovMachines";
-import { InvMov } from "../entity/InvMov";
+import { Users } from "../inventory/entity/Users";
+import { Storages } from "../inventory/entity/Storages";
+import { MovStorages } from "../inventory/entity/MovStorages";
+import { Machines } from "../inventory/entity/Machines";
+import { MovMachines } from "../inventory/entity/MovMachines";
+import { InvMov } from "../inventory/entity/InvMov";
 
 export const Conn = async () => await createConnection({
     type: "mssql",

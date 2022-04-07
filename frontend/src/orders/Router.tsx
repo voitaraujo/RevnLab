@@ -5,6 +5,7 @@ import {
   Route as PureRoute,
 } from "react-router-dom";
 
+import { Login } from './pages/login/index'
 import Route from "./components/privateRoute";
 
 function InnerRoutes(): JSX.Element {
@@ -12,7 +13,7 @@ function InnerRoutes(): JSX.Element {
     <Router>
       <Switch>
         <Route exact path="/" type="outter">
-          <h1>MAIN</h1>
+          <Login />
         </Route>
 
         <PureRoute exact path="/*" render={() => <h1>Não encontrado</h1>} />

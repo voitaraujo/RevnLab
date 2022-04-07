@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
 
-import { decryptToken, IToken } from '../services/jwtAuth'
+import { decryptToken, IToken } from '../../services/jwtAuth'
 import { InvMov } from '../entity/InvMov'
 
 export default {

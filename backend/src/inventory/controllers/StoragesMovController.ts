@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { getRepository, getConnection } from 'typeorm';
 
 import { MovStorages } from '../entity/MovStorages'
-import { decryptToken, IToken } from '../services/jwtAuth'
+import { decryptToken, IToken } from '../../services/jwtAuth'
 
 interface IProdutos {
     Refdt: string;

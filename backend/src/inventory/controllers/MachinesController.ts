@@ -5,7 +5,7 @@ import { getRepository, createQueryBuilder, getManager } from 'typeorm';
 import { Machines } from '../entity/Machines'
 import { MovMachines } from '../entity/MovMachines'
 // import { Storages } from '../entity/Storages'
-import { decryptToken, IToken } from '../services/jwtAuth'
+import { decryptToken, IToken } from '../../services/jwtAuth'
 
 interface IFaltaEmEq {
   Refdt: string,

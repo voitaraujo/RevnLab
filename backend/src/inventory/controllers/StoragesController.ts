@@ -5,7 +5,7 @@ import { getRepository, createQueryBuilder, getManager } from 'typeorm';
 // import { Storages } from '../entity/Storages'
 import { MovStorages } from '../entity/MovStorages'
 import { MovMachines } from '../entity/MovMachines'
-import { decryptToken, IToken } from '../services/jwtAuth'
+import { decryptToken, IToken } from '../../services/jwtAuth'
 
 interface IFaltaEmDL { DLCod: string, Refdt: string, FaltamProdutos: number }
 

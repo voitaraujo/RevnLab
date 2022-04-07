@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { getRepository, getManager } from 'typeorm';
 
 import { Users } from '../entity/Users'
-import { genToken } from '../services/jwtAuth'
+import { genToken } from '../../services/jwtAuth'
 
 interface ILoginDTO {
   user: string,

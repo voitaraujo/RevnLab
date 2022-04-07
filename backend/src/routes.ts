@@ -1,12 +1,13 @@
 import { Router, Response, Request } from 'express';
 
+//Inventário
 import { hasToken } from './services/jwtAuth'
-import UserController from './controllers/UserController';
-import StoragesController from './controllers/StoragesController';
-import MachinesController from './controllers/MachinesController';
-import StoragesMovController from './controllers/StoragesMovController';
-import MachinesMovController from './controllers/MachinesMovController';
-import InvMovController from './controllers/InvMovController';
+import UserController from './inventory/controllers/UserController';
+import StoragesController from './inventory/controllers/StoragesController';
+import MachinesController from './inventory/controllers/MachinesController';
+import StoragesMovController from './inventory/controllers/StoragesMovController';
+import MachinesMovController from './inventory/controllers/MachinesMovController';
+import InvMovController from './inventory/controllers/InvMovController';
 
 const routes = Router();
 

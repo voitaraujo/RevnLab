@@ -3,7 +3,7 @@ import { getRepository, getConnection } from 'typeorm';
 import moment from 'moment';
 
 import { MovMachines } from '../entity/MovMachines'
-import { decryptToken, IToken } from '../services/jwtAuth'
+import { decryptToken, IToken } from '../../services/jwtAuth'
 
 interface IProdutos {
     DLCod: string,
