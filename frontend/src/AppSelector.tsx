@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { useHistory } from 'react-router-dom'
+import React, { useState } from 'react';
+// import { useHistory } from "react-router-dom";
 
 import {
   Apartment as ApartmentIcon,
@@ -10,26 +10,53 @@ import Inventory from './inventory/App';
 import Orders from './orders/App';
 
 import { GlobalStyle } from './styles/global'
-import { SelectorContainer, AppButtons } from './components/styles'
+import {
+  SelectorAppContainer,
+  SelectorAppButtonsContainer,
+  SelectorAppButtons,
+  SelectorAppTitle
+} from './components/styles'
 
-export const AppSelector = () => {
-  const [appName, setAppName] = useState<IAppName>(null)
-  // const history = useHistory()
-
-  // console.log(useHistory)
+export function AppSelector() {
+  const [appName, setAppName] = useState<IAppName>(null);
+  // const history = useHistory();
 
   const whichAppShouldBeUsed = (): JSX.Element => {
     switch (appName) {
       case null:
-        return <Selector
-          onSelectApp={setAppName}
-        />
+        return <Selector />
       case 'orders':
         return <Orders />
       case 'inventory':
         return <Inventory />
     }
   }
+
+  const Selector = () => {
+    return (
+      <SelectorAppContainer>
+        <SelectorAppTitle>SOLUÇÕES PILÃO PROFESSIONAL</SelectorAppTitle>
+        <SelectorAppButtonsContainer>
+          <SelectorAppButtons onClick={() => {
+            // history.push('/')
+            setAppName('inventory')
+          }} >
+            <ApartmentIcon fontSize='large' />
+            INVENTÁRIO PILÃO PROFESSIONAL
+          </SelectorAppButtons>
+
+          <SelectorAppButtons onClick={() => {
+            // history.push('/')
+            setAppName('orders')
+          }} >
+            <ShoppingCartIcon fontSize='large' />
+            ENCOMENDA DE INSUMOS
+          </SelectorAppButtons>
+        </SelectorAppButtonsContainer>
+      </SelectorAppContainer>
+    )
+  }
+
 
   return (
     <>
@@ -39,34 +66,10 @@ export const AppSelector = () => {
   )
 }
 
-const Selector = ({ onSelectApp }: ISelectorProps) => {
-
-
-  return (
-    <SelectorContainer>
-
-      <AppButtons onClick={() => {
-        // history.push('/')
-        onSelectApp('inventory')
-      }} >
-        <ApartmentIcon fontSize='large' />
-        INVENTÁRIO PILÃO PROFESSIONAL
-      </AppButtons>
-
-      <AppButtons onClick={() => {
-        // history.push('/')
-        onSelectApp('orders')
-      }} >
-        <ShoppingCartIcon fontSize='large' />
-        ENCOMENDA DE INSUMOS
-      </AppButtons>
-
-    </SelectorContainer>
-  )
-}
 
 type IAppName = null | 'orders' | 'inventory'
 
-interface ISelectorProps {
-  onSelectApp: (props: IAppName) => void,
-}
+// interface ISelectorProps {
+//   onSelectApp: (props: IAppName) => void,
+//   handleNavigation: (url: string) => void
+// }
